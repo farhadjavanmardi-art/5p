@@ -4,10 +4,13 @@
   "description": "پنج ستون (5P): تحلیل هر کسب‌وکار در پنج ستون با Claude API",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=22.9" },
+  "engines": {
+    "node": ">=22.9"
+  },
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
-    "build:page": "node build-page.js"
+    "build:page": "node build-page.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0"
