@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="claude-shim.js"></script>
+</head>
+<body>
+<title>پنج ستون</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky header with five pillar bars that fill as work is done; side nav + main column; stacks on phones */
+:root{
+  --bg:#F2F4EF;--surface:#FFFFFF;--sunk:#E9ECE5;--ink:#1C2A33;--muted:#5B6970;--line:#D5DBD3;
+  --pillar:#1F6F78;--pillar-soft:#D4E7E5;--saffron:#C98A12;--saffron-soft:#F6E7C6;
+  --danger:#B3413A;--danger-soft:#F5DCD9;--ok:#357548;--ok-soft:#D9EDDF;--warn:#A86F12;--warn-soft:#F7E9CF;
+  --display:Lalezar,Vazirmatn,Tahoma,sans-serif;--body:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
+  --radius:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F171C;--surface:#162128;--sunk:#1B2830;--ink:#E4EBE7;--muted:#98A6AC;--line:#2A3942;
+  --pillar:#4FB0B6;--pillar-soft:#183739;--saffron:#E3AE4A;--saffron-soft:#3A2E17;
+  --danger:#E27A70;--danger-soft:#3D2220;--ok:#6CBF88;--ok-soft:#1C3325;--warn:#E3A548;--warn-soft:#3A2D16;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F171C;--surface:#162128;--sunk:#1B2830;--ink:#E4EBE7;--muted:#98A6AC;--line:#2A3942;
+  --pillar:#4FB0B6;--pillar-soft:#183739;--saffron:#E3AE4A;--saffron-soft:#3A2E17;
+  --danger:#E27A70;--danger-soft:#3D2220;--ok:#6CBF88;--ok-soft:#1C3325;--warn:#E3A548;--warn-soft:#3A2D16;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.85}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+a{color:var(--pillar)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+
+header.top{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.brandrow{display:flex;align-items:center;gap:14px;padding-block:10px 4px;flex-wrap:wrap}
+.logo{font-family:var(--display);font-size:30px;line-height:1;color:var(--pillar)}
+.logo small{font-family:var(--body);font-size:13px;color:var(--muted);margin-inline-start:8px}
+.projbox{margin-inline-start:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.projbox select{max-width:220px}
+.savestate{font-size:12px;color:var(--muted)}
+.pillars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding-block:6px 10px}
+.pl{border:0;background:var(--sunk);border-radius:6px 6px 2px 2px;height:46px;position:relative;cursor:pointer;padding:0;overflow:hidden;text-align:center}
+.pl .fill{position:absolute;inset:auto 0 0 0;background:var(--pillar-soft);transition:height .5s ease}
+.pl .lbl{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;height:100%;font-size:12.5px;line-height:1.35}
+.pl .lbl b{font-family:var(--display);font-weight:400;font-size:17px;color:var(--pillar)}
+.pl.cur{box-shadow:0 0 0 2px var(--saffron) inset}
+.pl.done .fill{background:var(--pillar)} .pl.done .lbl, .pl.done .lbl b{color:#fff}
+
+.shell{display:grid;grid-template-columns:220px 1fr;gap:28px;padding-block:24px 60px}
+nav.side{position:sticky;top:140px;align-self:start;display:flex;flex-direction:column;gap:2px}
+nav.side button{all:unset;cursor:pointer;padding:8px 12px;border-radius:8px;display:flex;justify-content:space-between;gap:8px;color:var(--ink)}
+nav.side button:hover{background:var(--sunk)}
+nav.side button:focus-visible{outline:2px solid var(--saffron)}
+nav.side button.on{background:var(--pillar-soft);color:var(--pillar);font-weight:700}
+nav.side .grp{font-size:12px;color:var(--muted);margin:14px 12px 4px;letter-spacing:.02em}
+nav.side .badge{font-size:11px;color:var(--muted)}
+main{min-width:0}
+h1{font-family:var(--display);font-weight:400;font-size:34px;line-height:1.3;margin:0 0 6px;text-wrap:balance}
+h2{font-size:19px;margin:30px 0 10px;line-height:1.5}
+h3{font-size:16px;margin:18px 0 6px}
+.lead{color:var(--muted);max-width:70ch;margin:0 0 18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:0 0 16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn:hover{background:var(--sunk)}
+.btn.pri{background:var(--pillar);border-color:var(--pillar);color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.warn{border-color:var(--danger);color:var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{padding:3px 10px;font-size:13px}
+.note{border-radius:8px;padding:10px 14px;margin:10px 0;font-size:14px}
+.note.info{background:var(--pillar-soft)} .note.warn{background:var(--warn-soft)} .note.crit{background:var(--danger-soft)} .note.ok{background:var(--ok-soft)}
+.muted{color:var(--muted)} .small{font-size:13px}
+
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px 18px}
+.field{min-width:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 9px}
+.field textarea{min-height:70px;resize:vertical}
+.field .hint{font-size:12px;color:var(--muted);min-height:1em}
+.field.wide{grid-column:1/-1}
+details.grp{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin:0 0 12px}
+details.grp>summary{cursor:pointer;padding:12px 18px;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary .muted{font-weight:400;font-size:13px}
+details.grp .inner{padding:4px 18px 18px}
+.tblwrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:13px;white-space:nowrap}
+td.num,th.num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.edit input,table.edit select{width:100%;min-width:80px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+
+.examples{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ex{all:unset;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.ex:hover{border-color:var(--pillar)} .ex:focus-visible{outline:2px solid var(--saffron)}
+.ex b{font-size:15px} .ex span{font-size:12.5px;color:var(--muted)}
+.ex.new{border-style:dashed}
+
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:21px;font-weight:700;line-height:1.4;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--muted)}
+.kpi.bad .v{color:var(--danger)} .kpi.good .v{color:var(--ok)}
+.triad{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden;margin-bottom:12px}
+.triad>div{padding:14px 16px;border-inline-start:1px solid var(--line);min-width:0}
+.triad>div:first-child{border-inline-start:0}
+.triad .t{font-size:13px;color:var(--muted)}
+.triad .big{font-family:var(--display);font-size:30px;line-height:1.3}
+.chart svg{width:100%;height:auto;display:block}
+
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin:0 0 14px;overflow:hidden}
+.sec>header{display:flex;gap:12px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--sunk)}
+.sec>header .no{font-family:var(--display);font-size:22px;color:var(--pillar);min-width:24px}
+.sec>header .ttl{font-weight:700}
+.sec>header .kind{margin-inline-start:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.sec .body{padding:10px 18px 16px;min-width:0}
+.sec .body p{margin:8px 0;max-width:78ch}
+.sec .body ul,.sec .body ol{margin:6px 0;padding-inline-start:22px}
+.chk li{list-style:none;position:relative}
+.chk li::before{content:"";position:absolute;right:-20px;top:.55em;width:11px;height:11px;border:1.5px solid var(--muted);border-radius:2px}
+.flag{font-size:12.5px;border-radius:6px;padding:4px 8px;margin:6px 0;display:inline-block}
+.flag.leak{background:var(--danger-soft)} .flag.nums{background:var(--warn-soft)}
+.pending{color:var(--muted);font-size:14px;padding:6px 0}
+.prog{margin:0;font-size:14px;padding-inline-start:20px}
+.sev{font-size:11.5px;border-radius:5px;padding:1px 7px;white-space:nowrap}
+.sev.critical{background:var(--danger);color:#fff}.sev.high{background:var(--danger-soft);color:var(--danger)}
+.sev.medium{background:var(--warn-soft);color:var(--warn)}.sev.low{background:var(--sunk);color:var(--muted)}
+.verdict{border-radius:var(--radius);padding:18px 22px;margin:0 0 18px;border:1px solid var(--line)}
+.verdict .v{font-family:var(--display);font-size:32px;line-height:1.3}
+.verdict ul{margin:6px 0 0;padding-inline-start:20px}
+.verdict.go{background:var(--ok-soft)} .verdict.cond{background:var(--warn-soft)} .verdict.stop{background:var(--danger-soft)}
+.bar{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;background:var(--pillar)}
+.bar i.low{background:var(--danger)} .bar i.mid{background:var(--saffron)}
+.phase{border-inline-start:4px solid var(--pillar);padding:4px 16px;margin:0 0 18px}
+.tl{display:inline-flex;gap:6px;flex-wrap:wrap;font-size:12.5px}
+.tl span{padding:1px 8px;border-radius:5px}
+.tl .g{background:var(--ok-soft)} .tl .y{background:var(--warn-soft)} .tl .r{background:var(--danger-soft)}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:16px;right:16px;max-width:520px;margin:0 auto;z-index:20;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .wrap{padding-inline:16px}
+  .shell{grid-template-columns:1fr;gap:10px;padding-top:12px}
+  nav.side{position:static;flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:6px}
+  nav.side .grp{display:none}
+  nav.side button{white-space:nowrap;background:var(--surface);border:1px solid var(--line)}
+  .triad{grid-template-columns:1fr}
+  .triad>div{border-inline-start:0;border-top:1px solid var(--line)}
+  .triad>div:first-child{border-top:0}
+  .pl .lbl span{display:none}
+  header.top{position:static}
+  .logo small{display:none}
+  .brandrow{gap:8px}
+  .examples{grid-template-columns:repeat(2,minmax(0,1fr))}
+  h1{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brandrow">
+      <div class="logo">پنج ستون<small>5P · تحلیل هر کسب‌وکار در پنج ستون</small></div>
+      <div class="projbox">
+        <select id="projSel" aria-label="پروژه‌ها" class="btn"></select>
+        <button class="btn" id="newProj">پروژه‌ی جدید</button>
+        <button class="btn" id="exportBtn">دانلود گزارش</button>
+        <span class="savestate" id="saveState"></span>
+      </div>
+    </div>
+    <div class="pillars" id="pillars" aria-label="پنج ستون"></div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="shell">
+    <nav class="side" id="nav" aria-label="بخش‌ها"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script>
+/* ================= engine (pure, generic for any business) ================= */
+const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const PEAKS={spring:1,summer:4,autumn:7,winter:10};
+const n0=v=>{const x=Number(v);return Number.isFinite(x)?x:0};
+function annuity(P,rA,n){if(!(P>0)||!(n>0))return 0;const r=rA/12;if(!r)return P/n;return P*r/(1-Math.pow(1+r,-n))}
+function seasonFactors(p){const amp={none:0,low:.12,high:.3}[p.season]||0;const pk=PEAKS[p.peak]??4;return MONTHS.map((_,i)=>1+amp*Math.cos(2*Math.PI*(i-pk)/12))}
+function mix(p){
+  const staff=p.staff||[];
+  const pctStaff=staff.filter(s=>s.payType==='pct').reduce((a,s)=>a+n0(s.amount),0)/100;
+  const fixedStaff=staff.filter(s=>s.payType!=='pct').reduce((a,s)=>a+n0(s.amount),0);
+  const fixedCosts=(p.fixedCosts||[]).reduce((a,c)=>a+n0(c.amount),0);
+  const marketing=(p.fixedCosts||[]).filter(c=>c.mkt).reduce((a,c)=>a+n0(c.amount),0);
+  return {pctStaff,fixedStaff,fixedCosts,marketing,fee:n0(p.feePct)/100};
+}
+/* one month at year-1 prices, average season */
+function monthEco(p,units){const m=mix(p);const price=n0(p.price);
+  const rev=units*price,fee=rev*m.fee,varC=units*n0(p.varPerUnit),staff=rev*m.pctStaff+m.fixedStaff,fixC=m.fixedCosts;
+  const ebitda=rev-fee-varC-staff-fixC;return {units,rev,fee,varC,staff,fixC,ebitda}}
+function runEngine(p,ov){
+  ov=ov||{};const H=36,m=mix(p),sf=seasonFactors(p);
+  const u0=n0(p.currentUnits),uT=n0(p.targetUnits),R=Math.max(1,n0(p.rampMonths)||12),cap0=n0(p.capacity);
+  const unitMul=ov.unitMul??1,priceMul=ov.priceMul??1,fixedMul=ov.fixedMul??1,varMul=ov.varMul??1;
+  const infl=n0(p.inflation)/100,tax=n0(p.taxPct)/100;
+  const initInv=n0(p.initialInvest),cash0=n0(p.startCash);
+  const loanAmt=n0(p.loanAmount),loanRate=n0(p.loanRate)/100,loanN=Math.max(0,n0(p.loanMonths));
+  const loanPay=annuity(loanAmt,loanRate,loanN),dep=initInv/60;
+  let cash=cash0+loanAmt,loanBal=loanAmt,accDep=0,cumInv=-initInv,payback=null,cumNet=0,draws=0;
+  const rows=[];
+  for(let t=1;t<=H;t++){
+    const cal=(n0(p.startMonth)+t-1)%12,yr=Math.floor((t-1)/12),inf=Math.pow(1+infl,yr);
+    const demand=Math.max(0,(u0+(uT-u0)*Math.min(1,t/R))*sf[cal]*unitMul);
+    const units=cap0>0?Math.min(cap0,demand):demand,capped=cap0>0&&demand>cap0+1e-9;
+    const price=n0(p.price)*inf*priceMul;
+    const rev=units*price,fee=rev*m.fee,varC=units*n0(p.varPerUnit)*inf*varMul;
+    const staff=rev*m.pctStaff+m.fixedStaff*inf,fixC=m.fixedCosts*inf*fixedMul,mkt=m.marketing*inf*fixedMul;
+    const ebitda=rev-fee-varC-staff-fixC;
+    accDep+=dep;
+    const interest=loanBal*loanRate/12;let principal=0;
+    if(loanBal>1e-6&&t<=loanN)principal=Math.min(loanBal,loanPay-interest);
+    loanBal-=principal;
+    const ebt=ebitda-dep-interest,taxv=Math.max(0,ebt)*tax,net=ebt-taxv;
+    const draw=Math.max(0,net)*n0(p.ownerDrawPct)/100;
+    cash+=net+dep-principal-draw;
+    cumInv+=net+dep;if(initInv>0&&payback===null&&cumInv>=0)payback=t;
+    cumNet+=net;draws+=draw;
+    const fixedAssets=initInv-accDep,equity=initInv+cash0+cumNet-draws;
+    const gap=(cash+fixedAssets)-(loanBal+equity);
+    rows.push({t,cal,yr,demand,units,capped,price,rev,fee,varC,staff,fixC,mkt,ebitda,dep,interest,tax:taxv,net,principal,draw,cash,loanBal,fixedAssets,equity,gap});
+  }
+  const years=[0,1,2].map(y=>{const r=rows.filter(x=>x.yr===y);const s=k=>r.reduce((a,x)=>a+x[k],0);const last=r[r.length-1];
+    return {y,units:s('units'),rev:s('rev'),ebitda:s('ebitda'),net:s('net'),tax:s('tax'),costs:s('rev')-s('ebitda'),mkt:s('mkt'),cash:last.cash,loanBal:last.loanBal,fixedAssets:last.fixedAssets,equity:last.equity,gap:last.gap}});
+  const today=monthEco(p,u0),target=monthEco(p,uT);
+  const cpu=n0(p.price)*(1-m.fee-m.pctStaff)-n0(p.varPerUnit);
+  const fixedMonthly=m.fixedStaff+m.fixedCosts;
+  const bep=cpu>0?fixedMonthly/cpu:Infinity;
+  const y1=years[0];
+  const roiY1=initInv>0?y1.net/initInv:null;
+  const upc=Math.max(0.01,n0(p.unitsPerCustomer)||1),repeat=n0(p.repeatPct)/100;
+  const newCust=uT/upc*(1-repeat);
+  const cac=newCust>0&&m.marketing>0?m.marketing/newCust:null;
+  const cpc=cpu*upc;
+  const minCash=rows.reduce((a,r)=>r.cash<a.cash?r:a,rows[0]);
+  const sumCheck=years.every((yy,i)=>Math.abs(yy.rev-rows.filter(r=>r.yr===i).reduce((a,r)=>a+r.rev,0))<1);
+  const maxGap=Math.max(...rows.map(r=>Math.abs(r.gap)));
+  const cappedMonths=rows.filter(r=>r.capped&&r.t<=24).length;
+  return {rows,years,today,target,cpu,cpc,bep,fixedMonthly,payback,roiY1,newCust,cac,marketing:m.marketing,minCash,sumCheck,maxGap,cappedMonths,sf};
+}
+function fa(v){return Math.round(n0(v)).toLocaleString('fa-IR')}
+function fa1(v){return n0(v).toLocaleString('fa-IR',{maximumFractionDigits:1})}
+function fmtM(v){const x=n0(v);if(Math.abs(x)>=1e9)return (x/1e9).toLocaleString('fa-IR',{maximumFractionDigits:2})+' میلیارد';if(Math.abs(x)>=1e6)return (x/1e6).toLocaleString('fa-IR',{maximumFractionDigits:1})+' میلیون';return Math.round(x).toLocaleString('fa-IR')}
+function pct(v){return v===null||v===undefined||!Number.isFinite(v)?'—':(v*100).toLocaleString('fa-IR',{maximumFractionDigits:0})+'٪'}
+
+function engineWarnings(p,E){
+  const W=[],u=p.unitName||'واحد';
+  if(E.today.ebitda<0)W.push({sev:'high',text:`با فروش فعلی (${fa(p.currentUnits)} ${u} در ماه) ماهانه حدود ${fmtM(-E.today.ebitda)} تومان زیان عملیاتی دارد.`});
+  if(n0(p.capacity)>0&&n0(p.targetUnits)>n0(p.capacity))W.push({sev:'high',text:`هدف (${fa(p.targetUnits)} ${u}) از ظرفیت (${fa(p.capacity)} ${u}) بیشتر است.`});
+  if(!Number.isFinite(E.bep))W.push({sev:'critical',text:`هر ${u} بعد از کسر هزینه‌های مستقیم ضرر می‌دهد؛ با هیچ حجم فروشی به سربه‌سر نمی‌رسد.`});
+  else if(E.bep>n0(p.targetUnits))W.push({sev:'critical',text:`نقطه سربه‌سر (${fa1(E.bep)} ${u}) از هدف فروش بالاتر است.`});
+  else if(n0(p.capacity)>0&&E.bep>0.8*n0(p.capacity))W.push({sev:'high',text:`نقطه سربه‌سر (${fa1(E.bep)} ${u}) بیش از ۸۰٪ ظرفیت است؛ حاشیه‌ی امنیت کم است.`});
+  if(E.cappedMonths>0)W.push({sev:'medium',text:`در ${fa(E.cappedMonths)} ماه از ۲۴ ماه اول، تقاضا از ظرفیت بیشتر است و فروش سقف می‌خورد.`});
+  if(E.cac!==null&&E.cpc>0&&E.cac>E.cpc)W.push({sev:'high',text:`هزینه‌ی جذب هر مشتری جدید (${fmtM(E.cac)}) از سود یک خرید او (${fmtM(E.cpc)}) بیشتر است.`});
+  if(E.marketing<=0)W.push({sev:'medium',text:'هیچ بودجه‌ی بازاریابی در هزینه‌ها علامت نخورده است.'});
+  if(E.payback===null&&n0(p.initialInvest)>0)W.push({sev:'high',text:'سرمایه‌ی اولیه در ۳۶ ماه برنمی‌گردد.'});
+  if(E.minCash.cash<0)W.push({sev:'critical',text:`نقدینگی در ماه ${fa(E.minCash.t)} به ${fmtM(E.minCash.cash)} تومان می‌رسد؛ یعنی پول کم می‌آید و باید پیش از شروع، منبع آن مشخص شود.`});
+  (p.reqs||[]).forEach(x=>{if(x.status==='yes')return;
+    if(x.critical)W.push({sev:x.status==='no'?'critical':'high',text:`«${x.name}»: ${x.status==='no'?'ندارد':'در حال اقدام'} (الزام اجباری${x.status==='no'?'، مانع پیش از اجرا':''}).`});
+    else W.push({sev:'medium',text:`«${x.name}»: ${x.status==='no'?'ندارد':'در حال اقدام'}.`})});
+  if(!E.sumCheck)W.push({sev:'critical',text:'خطای داخلی: جمع ماه‌ها با سال برابر نیست.'});
+  if(E.maxGap>1)W.push({sev:'critical',text:'خطای داخلی: ترازنامه تراز نیست.'});
+  return W;
+}
+function detScores(p,E){
+  const clamp=v=>Math.max(0,Math.min(100,v));const y1=E.years[0];const margin=y1.rev>0?y1.net/y1.rev:-1;
+  const a=clamp(margin/0.25*100);
+  const cap=n0(p.capacity)||n0(p.targetUnits)*1.25;
+  const b=Number.isFinite(E.bep)&&cap>0?clamp((0.9-E.bep/cap)/0.6*100):0;
+  const c=n0(p.initialInvest)<=0?100:E.payback===null?0:clamp((42-E.payback)/30*100);
+  const d=E.today.ebitda>=0?100:clamp(40+E.today.ebitda/Math.max(1,E.fixedMonthly)*40);
+  const e=E.minCash.cash>=0?100:0;
+  const fin=Math.round((a+b+c+d+e)/5);
+  const rq=p.reqs||[];const legal=rq.length?Math.round(rq.reduce((s,x)=>s+(x.status==='yes'?100:x.status==='wip'?50:0),0)/rq.length):null;
+  return {fin,parts:{margin:Math.round(a),bep:Math.round(b),payback:Math.round(c),today:Math.round(d),cash:e},legal,
+    blockers:rq.filter(x=>x.critical&&x.status==='no').map(x=>x.name),pendingCritical:rq.filter(x=>x.critical&&x.status==='wip').map(x=>x.name)};
+}
+
+/* ================= reference data ================= */
+const COUNTRIES={
+  IR:{label:'ایران',notes:'تبلیغ‌دهنده‌ی ایرانی معمولاً به Google Ads و Meta Ads دسترسی مستقیم ندارد. اینستاگرام فیلتر است و کاربران با فیلترشکن استفاده می‌کنند. کانال‌های معمول: اینستاگرام، تلگرام، واتس‌اپ، بله، روبیکا، ایتا، دیوار، نشان و بلد، و پلتفرم‌های داخلی هر صنعت (مثل اسنپ‌فود، شب، جاجگا، دیجی‌کالا). پرداخت با درگاه‌های شاپرکی یا کارت‌به‌کارت. سرویس‌های خارجی مثل Airbnb، Booking، Stripe و PayPal برای کسب‌وکار ایرانی در عمل قابل استفاده نیستند. در متن بنویس که مالک باید در دسترس بودن هر ابزار را بررسی کند.'},
+  DE:{label:'آلمان',notes:'Google Ads، Meta Ads، Google Business Profile و پلتفرم‌های بین‌المللی در دسترس‌اند. الزامات: DSGVO، Impressum برای وب‌سایت، Gewerbeanmeldung، قواعد مالیات بر ارزش افزوده. پرداخت: کارت، PayPal، SEPA.'},
+  OT:{label:'سایر',notes:'پیش از توصیه‌ی هر ابزار یا پلتفرم، در دسترس بودن آن را در کشور مالک «نیاز به بررسی» علامت بزن.'}
+};
+const UNIT_SUGGEST=['شب','سفارش','فنجان','نوبت','جلسه','ثبت‌نام','اشتراک','فاکتور','پروژه','عدد','کیلو','بلیت'];
+
+/* ================= the five pillars ================= */
+const COLS=[
+{id:1,title:'امکان‌سنجی',purpose:'آیا این کسب‌وکار از نظر بازار، اجرا، پول و قانون شدنی است و با چه شرطی؟',boundary:'جزئیات بازاریابی مال ستون ۳، رویه‌ها مال ستون ۴ و جدول‌های مالی مال ستون ۵ است؛ این‌جا فقط نتیجه و ارجاع.',sections:[
+ {no:1,t:'خلاصه و تصمیمی که گرفته می‌شود',k:'ai',ex:'این تحلیل پشتوانه‌ی چه تصمیمی است و جواب کوتاه چیست.',must:['تصمیمی که گزارش پشتیبانی می‌کند','جدول «شاخص / امروز / هدف» با اعداد موتور','جمع‌بندی یک‌خطی بی‌طرف']},
+ {no:2,t:'بازار و تقاضا',k:'ai',ex:'چه کسانی و چقدر می‌خرند.',must:['گروه‌های مشتری از پرونده','فرض‌های تقاضا با برچسب (فرض)','یک آزمون ۳۰ روزه برای سنجیدن تقاضا']},
+ {no:3,t:'اجرا و امکانات',k:'ai',ex:'آیا با امکانات و تیم فعلی قابل اجراست.',must:['ظرفیت و محدودیت‌ها','وابستگی‌های حیاتی (آدم، تأمین‌کننده، ابزار)','جدول «مؤلفه / وضعیت / اقدام لازم»']},
+ {no:4,t:'امروز، سربه‌سر، هدف',k:'engine',engine:'finSummary'},
+ {no:5,t:'مجوزها و الزامات',k:'mix',engine:'reqs',ex:'چه مجوز و الزامی لازم است.',must:['پیامد نبودن هر مورد','موارد اجباری ناقص به‌عنوان مانع پیش از اجرا','الزامات رایج این نوع کسب‌وکار که در فهرست نیامده، با برچسب «پیشنهاد برای بررسی»']},
+ {no:6,t:'ریسک‌ها',k:'ai',ex:'چه چیزی ممکن است خراب شود.',must:['جدول ریسک: احتمال، اثر، راهکار','دست‌کم دو ریسک از هشدارهای موتور','محرک عددی برای هر ریسک (اگر ... شد، ... کن)']},
+ {no:7,t:'SWOT',k:'ai',ex:'قوت، ضعف، فرصت، تهدید.',must:['جدول ۴ بخشی؛ هر مورد با شاهد از پرونده یا موتور']},
+ {no:8,t:'نتیجه و شرط‌های اجرا',k:'ai',ex:'انجام بدهیم یا نه.',must:['نتیجه‌ی روشن: اجرا، اجرا با شرط، یا توقف','شرط‌های مشخص و قابل سنجش با مهلت']}]},
+{id:2,title:'بیزینس پلن',purpose:'تصویر یکپارچه‌ی کسب‌وکار برای مالک، شریک یا سرمایه‌گذار.',boundary:'بازار، عملیات و مالی را فقط خلاصه کن و به ستون‌های ۳، ۴ و ۵ ارجاع بده.',sections:[
+ {no:1,t:'خلاصه اجرایی',k:'ai',ex:'چکیده برای تصمیم سریع.',must:['کسب‌وکار در یک جمله','وضعیت امروز و هدف','عدد کلیدی مالی از موتور','درخواست یا نیاز (اگر هست)']},
+ {no:2,t:'معرفی و تیم',k:'mix',engine:'staff',ex:'چه کسی، کجا، با چه تیمی.',must:['مشخصات از پرونده','سابقه‌ی مالک فقط اگر وارد شده؛ وگرنه [داده لازم]','ساختار تصمیم‌گیری']},
+ {no:3,t:'محصول، خدمت و قیمت',k:'ai',ex:'چه می‌فروشیم و به چه قیمت.',must:['محصول یا خدمت اصلی','منطق قیمت با قیمت پرونده','پیشنهاد محصول یا خدمت جانبی با برچسب «پیشنهاد»']},
+ {no:4,t:'تمایز',k:'ai',ex:'چرا مشتری ما را انتخاب کند.',must:['حداکثر ۳ تمایز واقعی از پرونده','راه اثبات هر تمایز به مشتری']},
+ {no:5,t:'خلاصه مالی',k:'engine',engine:'finSummary'},
+ {no:6,t:'پول لازم و منبع آن',k:'ai',ex:'نیاز مالی و گزینه‌های تأمین.',must:['سرمایه و وام از پرونده','پایین‌ترین نقطه‌ی نقدینگی از موتور','گزینه‌ها (منابع داخلی، شریک، وام) با پیامد هر کدام']},
+ {no:7,t:'مسیر رشد',k:'ai',ex:'مراحل بزرگ شدن.',must:['مراحل با شرط شروع (مثلاً بعد از رسیدن به سربه‌سر)','بدون تاریخ‌های قطعی خیالی']},
+ {no:8,t:'جمع‌بندی',k:'ai',ex:'پیام روشن به خواننده.',must:['نتیجه‌ی بی‌طرف و مشروط']}]},
+{id:3,title:'بازاریابی',purpose:'چطور مشتری کافی با هزینه‌ی قابل تحمل جذب کنیم.',boundary:'فقط جذب و نگه‌داشتن مشتری؛ قیمت‌گذاری مالی مال ستون ۵ است.',sections:[
+ {no:1,t:'هدف بازاریابی به زبان عدد',k:'mix',engine:'marketing',ex:'هدف فروش را به مشتری جدید تبدیل کن.',must:['تعداد مشتری جدید لازم در ماه از موتور','اهداف ۳ و ۶ ماهه']},
+ {no:2,t:'مشتری هدف و پرسونا',k:'ai',ex:'چه کسی می‌خرد و چرا.',must:['۲ تا ۳ گروه مشتری از پرونده','یک پرسونای فرضی (صریح بنویس فرضی است) با مسیر خرید']},
+ {no:3,t:'رقبا و جایگاه',k:'ai',ex:'نقشه‌ی رقبا و جای ما.',must:['فقط رقبای پرونده، با لحن بی‌طرف','یک جمله‌ی جایگاه‌یابی']},
+ {no:4,t:'پیام و ارزش پیشنهادی',k:'ai',ex:'وعده‌ی اصلی و لحن.',must:['وعده‌ی یک‌خطی','لحن برای هر کانال','دو نمونه متن کوتاه تبلیغ']},
+ {no:5,t:'کانال‌ها و کمپین‌ها',k:'ai',ex:'از کجا و با چه برنامه‌ای.',must:['فقط کانال‌های قابل استفاده در کشور مالک','۲ تا ۳ کمپین با هدف، زمان، پیام، ابزار و شاخص موفقیت','توزیع بودجه‌ی بازاریابی موتور بین کانال‌ها']},
+ {no:6,t:'تقویم محتوا و وفاداری',k:'ai',ex:'چه محتوایی، کی، و چطور مشتری برگردد.',must:['تقویم فصلی هماهنگ با فصل اوج پرونده','تناوب قابل اجرا برای تیم فعلی','یک برنامه‌ی ساده‌ی بازگشت مشتری']},
+ {no:7,t:'شاخص‌ها و محرک‌های اصلاح',k:'ai',ex:'چه چیزی را می‌سنجیم.',must:['جدول KPI با دوره','محرک‌ها: اگر ... شد، ... کن']}]},
+{id:4,title:'عملیات',purpose:'کارها هر روز یکسان و بدون وابستگی به یک نفر انجام شوند.',boundary:'عددها (دستمزد، بودجه) را از پرونده و موتور بگیر و عدد جدید نساز؛ فقط «چطور اجرا شود».',sections:[
+ {no:1,t:'نقش‌ها و مسئولیت‌ها',k:'mix',engine:'staff',ex:'چه کسی چه کاری می‌کند.',must:['برای هر نقش ۴ تا ۶ وظیفه‌ی قابل سنجش','جایگزین هر نقش در غیبت']},
+ {no:2,t:'فرایند اصلی خدمت',k:'ai',ex:'از اولین تماس مشتری تا تحویل و پیگیری.',must:['گام‌به‌گام با بلوک steps','مسئول و زمان هر گام']},
+ {no:3,t:'استاندارد کیفیت',k:'ai',ex:'حداقل قابل قبول و هدف.',must:['جدول شاخص / حداقل / هدف','قانون: زیر حداقل ← علت، راه‌حل، ثبت']},
+ {no:4,t:'ایمنی، بهداشت و الزامات',k:'mix',engine:'reqs',ex:'چطور الزامات هر روز رعایت شود.',must:['روال روزانه‌ی رعایت هر الزام','جدول حادثه / اقدام فوری']},
+ {no:5,t:'شکایت و بحران',k:'ai',ex:'واکنش به مشکل.',must:['گام‌های رسیدگی به شکایت','دسته‌بندی بحران و واکنش']},
+ {no:6,t:'خرید، موجودی و گزارش',k:'ai',ex:'چه چیزی کی خریده و گزارش می‌شود.',must:['جدول قلم / حداقل موجودی / مسئول','یک مهلت واحد برای هر گزارش']},
+ {no:7,t:'چک‌لیست‌های روزانه و هفتگی',k:'ai',ex:'قابل چاپ و اجرا.',must:['دست‌کم سه چک‌لیست با بلوک check']}]},
+{id:5,title:'مالی',purpose:'عددهای قابل اتکا برای تصمیم؛ همه از یک موتور.',boundary:'همه‌ی جدول‌ها از موتور می‌آید؛ متن فقط تفسیر می‌کند و عدد جدید نمی‌سازد.',sections:[
+ {no:1,t:'فرض‌ها',k:'engine',engine:'assumptions'},
+ {no:2,t:'۱۲ ماه اول',k:'engine',engine:'monthly'},
+ {no:3,t:'پیش‌بینی سه‌ساله و ترازنامه',k:'engine',engine:'years'},
+ {no:4,t:'سناریوها و حساسیت',k:'engine',engine:'scenarios'},
+ {no:5,t:'تعریف شاخص‌ها',k:'engine',engine:'glossary'},
+ {no:6,t:'تفسیر مالی',k:'ai',ex:'این اعداد چه می‌گویند.',must:['سه نکته‌ی مهم از جدول‌ها','فرضی که بیشترین اثر را دارد (از جدول حساسیت)','نقطه‌ی ضعف مدل']},
+ {no:7,t:'سیاست پول',k:'ai',ex:'برداشت، ذخیره، بازپرداخت.',must:['برداشت مالک و ذخیره‌ی نقد با اعداد موتور','قانون ذخیره‌ی اضطراری (چند ماه هزینه‌ی ثابت)']}]}
+];
+
+/* ================= examples (clearly marked) ================= */
+const BASE={name:'',bizType:'',country:'IR',city:'',stage:'active',description:'',owner:'',ownerBio:'',customers:'',competitors:'',advantage:'',goals:'',
+  unitName:'واحد',unitsPerCustomer:1,price:0,currentUnits:0,targetUnits:0,rampMonths:12,capacity:0,season:'none',peak:'summer',
+  varPerUnit:0,feePct:0,staff:[],fixedCosts:[{name:'اجاره',amount:0,mkt:false},{name:'بازاریابی',amount:0,mkt:true}],repeatPct:30,
+  initialInvest:0,startCash:0,loanAmount:0,loanRate:0,loanMonths:0,inflation:30,taxPct:10,ownerDrawPct:50,
+  startMonth:7,startYear:1405,reqs:[]};
+/* Templates: typical starting numbers per business type (Iran, toman). Marked as samples in the UI. */
+const R=(name,critical)=>({name,status:'no',critical:critical!==false});
+const TEMPLATES={
+ cafe:{label:'کافه',p:{bizType:'کافه',unitName:'فنجان',unitsPerCustomer:1.5,price:95000,currentUnits:1500,targetUnits:4000,rampMonths:10,capacity:7500,season:'low',peak:'autumn',varPerUnit:38000,feePct:1,
+   staff:[{role:'باریستا (۲ نفر)',payType:'fixed',amount:30000000},{role:'مدیر کافه',payType:'fixed',amount:20000000}],
+   fixedCosts:[{name:'اجاره',amount:45000000,mkt:false},{name:'انرژی و اینترنت',amount:6000000,mkt:false},{name:'بازاریابی',amount:8000000,mkt:true}],
+   repeatPct:60,initialInvest:1500000000,startCash:200000000,reqs:[R('پروانه کسب اتحادیه'),R('کارت بهداشت کارکنان'),R('تأییدیه بهداشت محیط'),R('کپسول آتش‌نشانی')]}},
+ restaurant:{label:'رستوران و فست‌فود',p:{bizType:'رستوران',unitName:'پرس',unitsPerCustomer:2,price:450000,currentUnits:700,targetUnits:2000,rampMonths:12,capacity:4000,season:'none',varPerUnit:200000,feePct:8,
+   staff:[{role:'آشپزها',payType:'fixed',amount:40000000},{role:'سالن و پیک',payType:'fixed',amount:30000000}],
+   fixedCosts:[{name:'اجاره',amount:60000000,mkt:false},{name:'انرژی',amount:12000000,mkt:false},{name:'بازاریابی',amount:10000000,mkt:true}],
+   repeatPct:55,initialInvest:2500000000,startCash:300000000,reqs:[R('پروانه کسب اتحادیه'),R('کارت بهداشت کارکنان'),R('تأییدیه بهداشت محیط'),R('کپسول و سیستم اطفای آشپزخانه')]}},
+ salon:{label:'آرایشگاه و سالن زیبایی',p:{bizType:'سالن زیبایی',unitName:'نوبت',unitsPerCustomer:1,price:800000,currentUnits:150,targetUnits:400,rampMonths:12,capacity:600,season:'low',peak:'spring',varPerUnit:150000,feePct:1,
+   staff:[{role:'آرایشگرها',payType:'pct',amount:40},{role:'منشی',payType:'fixed',amount:12000000}],
+   fixedCosts:[{name:'اجاره',amount:25000000,mkt:false},{name:'انرژی',amount:4000000,mkt:false},{name:'بازاریابی',amount:5000000,mkt:true}],
+   repeatPct:70,initialInvest:600000000,startCash:100000000,reqs:[R('پروانه کسب اتحادیه'),R('کارت بهداشت کارکنان'),R('تأییدیه بهداشت محیط'),R('روال ضدعفونی ابزار')]}},
+ shop:{label:'فروشگاه (حضوری یا آنلاین)',p:{bizType:'فروشگاه',unitName:'فاکتور',unitsPerCustomer:1,price:1200000,currentUnits:200,targetUnits:600,rampMonths:12,capacity:0,season:'low',peak:'winter',varPerUnit:800000,feePct:3,
+   staff:[{role:'فروشنده',payType:'fixed',amount:15000000}],
+   fixedCosts:[{name:'اجاره یا سایت',amount:30000000,mkt:false},{name:'انرژی و اینترنت',amount:3000000,mkt:false},{name:'بازاریابی',amount:10000000,mkt:true}],
+   repeatPct:40,initialInvest:800000000,startCash:150000000,reqs:[R('پروانه کسب یا نماد اعتماد'),R('کد اقتصادی و ثبت در سامانه مالیاتی'),R('کپسول آتش‌نشانی',false)]}},
+ school:{label:'آموزشگاه و کلاس',p:{bizType:'آموزشگاه',unitName:'ثبت‌نام',unitsPerCustomer:1,price:2500000,currentUnits:40,targetUnits:120,rampMonths:12,capacity:150,season:'high',peak:'autumn',varPerUnit:200000,feePct:1,
+   staff:[{role:'مدرس‌ها',payType:'pct',amount:40},{role:'مدیر آموزشی',payType:'fixed',amount:18000000}],
+   fixedCosts:[{name:'اجاره',amount:35000000,mkt:false},{name:'انرژی و اینترنت',amount:4000000,mkt:false},{name:'بازاریابی',amount:10000000,mkt:true}],
+   repeatPct:70,initialInvest:600000000,startCash:100000000,reqs:[R('مجوز آموزشگاه'),R('بیمه کارکنان'),R('کپسول و خروجی اضطراری')]}},
+ lodge:{label:'اقامتگاه و بوم‌گردی',p:{bizType:'اقامتگاه',unitName:'شب',unitsPerCustomer:2,price:2500000,currentUnits:5,targetUnits:18,rampMonths:12,capacity:28,season:'high',peak:'summer',varPerUnit:150000,feePct:8,
+   staff:[{role:'مدیر یا میزبان',payType:'pct',amount:10}],
+   fixedCosts:[{name:'انرژی و اینترنت',amount:2000000,mkt:false},{name:'نگهداری',amount:2000000,mkt:false},{name:'بیمه',amount:1500000,mkt:false},{name:'بازاریابی',amount:3000000,mkt:true}],
+   repeatPct:25,initialInvest:150000000,startCash:20000000,reqs:[R('مجوز اقامتگاه'),R('بیمه مسئولیت',false),R('کپسول و کمک‌های اولیه'),R('هشداردهنده دود و گاز')]}},
+ service:{label:'خدمات و پیمانکاری',p:{bizType:'خدمات',unitName:'پروژه',unitsPerCustomer:1,price:15000000,currentUnits:3,targetUnits:10,rampMonths:12,capacity:15,season:'none',varPerUnit:4000000,feePct:0,
+   staff:[{role:'کارشناس',payType:'fixed',amount:25000000}],
+   fixedCosts:[{name:'دفتر',amount:10000000,mkt:false},{name:'ابزار و نرم‌افزار',amount:3000000,mkt:false},{name:'بازاریابی',amount:5000000,mkt:true}],
+   repeatPct:40,initialInvest:200000000,startCash:100000000,reqs:[R('ثبت کسب‌وکار'),R('قرارداد کتبی با مشتری'),R('بیمه مسئولیت حرفه‌ای',false)]}},
+ online:{label:'سرویس آنلاین و اشتراکی',p:{bizType:'سرویس آنلاین',unitName:'اشتراک',unitsPerCustomer:1,price:300000,currentUnits:200,targetUnits:1500,rampMonths:18,capacity:0,season:'none',varPerUnit:30000,feePct:3,
+   staff:[{role:'برنامه‌نویس',payType:'fixed',amount:60000000},{role:'پشتیبانی',payType:'fixed',amount:20000000}],
+   fixedCosts:[{name:'سرور و ابزار',amount:8000000,mkt:false},{name:'بازاریابی',amount:20000000,mkt:true}],
+   repeatPct:85,initialInvest:500000000,startCash:300000000,reqs:[R('نماد اعتماد'),R('سیاست حریم خصوصی'),R('پشتیبان‌گیری منظم داده')]}},
+ production:{label:'تولیدی و کارگاه',p:{bizType:'کارگاه تولیدی',unitName:'عدد',unitsPerCustomer:10,price:450000,currentUnits:800,targetUnits:2500,rampMonths:12,capacity:4000,season:'none',varPerUnit:250000,feePct:2,
+   staff:[{role:'کارگران (۳ نفر)',payType:'fixed',amount:45000000}],
+   fixedCosts:[{name:'اجاره کارگاه',amount:30000000,mkt:false},{name:'انرژی',amount:10000000,mkt:false},{name:'بازاریابی',amount:6000000,mkt:true}],
+   repeatPct:60,initialInvest:1200000000,startCash:250000000,reqs:[R('پروانه کارگاه یا بهره‌برداری'),R('بیمه کارگران'),R('ایمنی دستگاه‌ها')]}},
+ other:{label:'سایر',p:{bizType:'',unitName:'واحد'}}
+};
+
+const clone=o=>JSON.parse(JSON.stringify(o));
+function makeProfile(key){const t=TEMPLATES[key]||TEMPLATES.other;return Object.assign(clone(BASE),clone(t.p),{name:t.p.bizType?t.p.bizType+' من':'کسب‌وکار من'})}
+
+/* ================= state ================= */
+const S={pid:null,profile:null,E:null,W:[],D:null,out:{},reviews:{},plan:null,view:'profile',busy:false,projects:[],exampleKey:null,progress:null};
+let SAMPLE=null,SAMPLE_P=null,DB=null,UID=null,DL=null,CTL=null;
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ================= dom helpers ================= */
+function el(tag,attrs,...kids){const e=document.createElement(tag);if(attrs)for(const[k,v]of Object.entries(attrs)){if(v===null||v===undefined||v===false)continue;if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?'':v)}
+  for(const k of kids.flat()){if(k===null||k===undefined||k===false)continue;e.append(k instanceof Node?k:document.createTextNode(String(k)))}return e}
+const $=id=>document.getElementById(id);
+function table(head,rows,numCols){numCols=numCols||[];return el('div',{class:'tblwrap'},el('table',null,el('thead',null,el('tr',null,head.map((h,i)=>el('th',{class:numCols.includes(i)?'num':null,text:h})))),el('tbody',null,rows.map(r=>el('tr',null,r.map((c,i)=>el('td',{class:numCols.includes(i)?'num':null},c instanceof Node?c:String(c))))))))}
+function kpi(l,v,s,cls){return el('div',{class:'kpi '+(cls||'')},el('div',{class:'l',text:l}),el('div',{class:'v',text:v}),s?el('div',{class:'s',text:s}):null)}
+function sevChip(s){const m={critical:'بحرانی',high:'زیاد',medium:'متوسط',low:'کم'};return el('span',{class:'sev '+s,text:m[s]||s})}
+function toast(t){const n=el('div',{class:'note info toast',role:'status',text:t});document.body.append(n);setTimeout(()=>n.remove(),5200)}
+function recompute(){S.E=runEngine(S.profile);S.W=engineWarnings(S.profile,S.E);S.D=detScores(S.profile,S.E)}
+function calName(t){const p=S.profile;const idx=n0(p.startMonth)+t-1;return MONTHS[idx%12]+' '+fa(n0(p.startYear)+Math.floor(idx/12))}
+
+/* ================= chart ================= */
+function lineChart(series,labels,opts){opts=opts||{};const W=720,H=230,P={l:60,r:14,t:14,b:30};
+  const all=series.flatMap(s=>s.data);let mn=Math.min(0,...all),mx=Math.max(1,...all);if(mx===mn)mx=mn+1;
+  const x=i=>P.l+(W-P.l-P.r)*i/Math.max(1,labels.length-1),y=v=>P.t+(H-P.t-P.b)*(1-(v-mn)/(mx-mn));
+  const NS='http://www.w3.org/2000/svg';const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',opts.label||'نمودار');
+  const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);svg.append(e);return e};
+  for(let g=0;g<=4;g++){const v=mn+(mx-mn)*g/4;mk('line',{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:'var(--line)','stroke-width':1});const tx=mk('text',{x:P.l-6,y:y(v)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'});tx.textContent=opts.fmt?opts.fmt(v):fa(v)}
+  if(mn<0)mk('line',{x1:P.l,x2:W-P.r,y1:y(0),y2:y(0),stroke:'var(--muted)','stroke-width':1.2});
+  labels.forEach((l,i)=>{if(i%Math.ceil(labels.length/8)===0){const tx=mk('text',{x:x(i),y:H-8,'text-anchor':'middle','font-size':11,fill:'var(--muted)'});tx.textContent=l}});
+  series.forEach(s=>{const d=s.data.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');mk('path',{d,fill:'none',stroke:s.color,'stroke-width':2.4,'stroke-linejoin':'round','stroke-dasharray':s.dash||'none'});
+    const li=s.data.length-1;mk('circle',{cx:x(li),cy:y(s.data[li]),r:3.5,fill:s.color})});
+  const lg=el('div',{class:'row small muted'},series.map(s=>el('span',null,el('span',{style:`display:inline-block;width:14px;height:3px;background:${s.color};vertical-align:middle;margin-inline-end:6px`}),s.name)));
+  return el('div',{class:'chart'},svg,lg)}
+
+/* ================= engine renderers ================= */
+const ER={
+ finSummary(){const E=S.E,p=S.profile,u=p.unitName;const y1=E.years[0];
+   const tri=el('div',{class:'triad'},
+     el('div',null,el('div',{class:'t',text:'امروز'}),el('div',{class:'big',text:`${fa(p.currentUnits)} ${u}`}),el('div',{class:'small',text:`درآمد ${fmtM(E.today.rev)} · سود عملیاتی ${fmtM(E.today.ebitda)}`})),
+     el('div',null,el('div',{class:'t',text:'نقطه سربه‌سر'}),el('div',{class:'big',text:Number.isFinite(E.bep)?`${fa1(E.bep)} ${u}`:'ندارد'}),el('div',{class:'small',text:`سود هر ${u} پیش از هزینه‌ی ثابت: ${fmtM(E.cpu)}`})),
+     el('div',null,el('div',{class:'t',text:'هدف'}),el('div',{class:'big',text:`${fa(p.targetUnits)} ${u}`}),el('div',{class:'small',text:`درآمد ${fmtM(E.target.rev)} · سود عملیاتی ${fmtM(E.target.ebitda)}`})));
+   return el('div',null,tri,
+     el('div',{class:'kgrid'},kpi('درآمد سال اول',fmtM(y1.rev)),kpi('سود خالص سال اول',fmtM(y1.net),pct(y1.rev?y1.net/y1.rev:null)+' حاشیه',y1.net<0?'bad':''),
+       kpi('بازگشت سرمایه',E.payback?`ماه ${fa(E.payback)}`:'در ۳۶ ماه نه',null,E.payback?'':'bad'),kpi('ROI سال اول',pct(E.roiY1)),
+       kpi('کمترین نقدینگی',fmtM(E.minCash.cash),`ماه ${fa(E.minCash.t)}`,E.minCash.cash<0?'bad':'')),
+     el('p',{class:'small muted',text:'امروز و هدف: یک ماه عادی با قیمت‌های سال اول. مبالغ به تومان.'}),
+     lineChart([{name:`${u} در ماه`,data:E.rows.slice(0,24).map(r=>r.units),color:'var(--pillar)'},{name:'سربه‌سر',data:E.rows.slice(0,24).map(()=>Number.isFinite(E.bep)?E.bep:0),color:'var(--danger)',dash:'5 4'}],E.rows.slice(0,24).map(r=>MONTHS[r.cal]),{label:'فروش ۲۴ ماه در برابر سربه‌سر'}))},
+ staff(){const E=S.E,p=S.profile;const st=p.staff||[];if(!st.length)return el('p',{class:'muted',text:'نیرویی در پرونده ثبت نشده است.'});
+   const pay=(s,e)=>s.payType==='pct'?e.rev*n0(s.amount)/100:n0(s.amount);
+   return table(['نقش','نوع پرداخت','نرخ','ماهانه امروز','ماهانه در هدف'],st.map(s=>[s.role,s.payType==='pct'?'درصد فروش':'ماهانه ثابت',s.payType==='pct'?fa1(s.amount)+'٪':fmtM(s.amount),fmtM(pay(s,E.today)),fmtM(pay(s,E.target))]),[2,3,4])},
+ reqs(){const p=S.profile;const st={yes:'دارد',wip:'در حال اقدام',no:'ندارد'};const rq=p.reqs||[];
+   if(!rq.length)return el('p',{class:'muted',text:'مجوز یا الزامی در پرونده ثبت نشده است.'});
+   return table(['مورد','اجباری','وضعیت'],rq.map(x=>[x.name,x.critical?'بله':'خیر',(x.status==='yes'?'✓ ':'✗ ')+(st[x.status]||x.status)+(x.critical&&x.status==='no'?' (مانع)':'')]))},
+ marketing(){const E=S.E,p=S.profile;
+   return el('div',{class:'kgrid'},kpi('بودجه‌ی بازاریابی ماهانه',fmtM(E.marketing)),kpi('مشتری جدید لازم در ماه (در هدف)',fa1(E.newCust),`با ${fa(p.repeatPct)}٪ مشتری تکراری`),
+     kpi('هزینه‌ی جذب هر مشتری',E.cac===null?'—':fmtM(E.cac),null,E.cac!==null&&E.cac>E.cpc?'bad':''),kpi('سود یک خرید مشتری',fmtM(E.cpc)))},
+ assumptions(){const p=S.profile;const m=mix(p);const u=p.unitName;
+   return table(['فرض','مقدار','منبع'],[
+    ['واحد فروش',u,'مالک'],['فروش امروز',`${fa(p.currentUnits)} ${u} در ماه`,'مالک'],['هدف',`${fa(p.targetUnits)} ${u} در ${fa(p.rampMonths)} ماه`,'مالک'],
+    ['ظرفیت',n0(p.capacity)?`${fa(p.capacity)} ${u} در ماه`:'بدون سقف','مالک'],['قیمت هر '+u,fmtM(p.price)+' تومان','مالک'],
+    ['هزینه‌ی مستقیم هر '+u,fmtM(p.varPerUnit)+' تومان','مالک'],['کارمزد و کمیسیون فروش',fa1(p.feePct)+'٪','مالک'],
+    ['هزینه‌ی ثابت ماهانه (با حقوق ثابت)',fmtM(m.fixedCosts+m.fixedStaff),'مالک'],['فصلی بودن',{none:'ندارد',low:'کم (±۱۲٪)',high:'زیاد (±۳۰٪)'}[p.season],'مالک'],
+    ['تورم سالانه (قیمت و هزینه)',fa(p.inflation)+'٪','فرض'],['مالیات بر سود',fa(p.taxPct)+'٪','فرض'],['مشتری تکراری',fa(p.repeatPct)+'٪','فرض'],
+    ['سرمایه‌ی اولیه',fmtM(p.initialInvest)+' (استهلاک ۵ ساله)','مالک'],['وام',n0(p.loanAmount)?`${fmtM(p.loanAmount)}، ${fa(p.loanRate)}٪، ${fa(p.loanMonths)} ماه`:'ندارد','مالک'],
+    ['شروع مدل',MONTHS[n0(p.startMonth)]+' '+fa(p.startYear),'مالک']])},
+ monthly(){const E=S.E;return el('div',null,table(['ماه',S.profile.unitName,'درآمد','هزینه‌ی عملیاتی','سود خالص','نقد پایان ماه'],E.rows.slice(0,12).map(r=>[calName(r.t),fa1(r.units)+(r.capped?' ▲':''),fmtM(r.rev),fmtM(r.rev-r.ebitda),fmtM(r.net),fmtM(r.cash)]),[1,2,3,4,5]),
+   E.cappedMonths?el('p',{class:'small muted',text:'▲ یعنی تقاضا از ظرفیت بیشتر بوده و فروش سقف خورده است.'}):null)},
+ years(){const E=S.E;return el('div',null,table(['سال',S.profile.unitName,'درآمد','هزینه‌ی عملیاتی','سود خالص','حاشیه','نقد پایان سال'],E.years.map(y=>['سال '+fa(y.y+1),fa(y.units),fmtM(y.rev),fmtM(y.costs),fmtM(y.net),pct(y.rev?y.net/y.rev:null),fmtM(y.cash)]),[1,2,3,4,5,6]),
+   el('h3',{text:'ترازنامه‌ی پایان سال'}),table(['پایان سال','نقد','دارایی ثابت (خالص)','وام','حقوق مالک'],E.years.map(y=>['سال '+fa(y.y+1),fmtM(y.cash),fmtM(y.fixedAssets),fmtM(y.loanBal),fmtM(y.equity)]),[1,2,3,4]),
+   el('p',{class:'small muted',text:(E.sumCheck?'✓ جمع ماه‌ها با ارقام سالانه برابر است. ':'✗ جمع ماه‌ها با سال برابر نیست. ')+(E.maxGap<=1?'✓ ترازنامه در همه‌ی ماه‌ها تراز است.':'✗ ترازنامه تراز نیست.')}))},
+ scenarios(){const p=S.profile;const defs=[['بدبینانه',{unitMul:.7,priceMul:.9}],['پایه',{}],['خوش‌بینانه',{unitMul:1.15}]];
+   const rows=defs.map(([n,o])=>{const e=runEngine(p,o);return [n,fmtM(e.years[0].rev),fmtM(e.years[0].net),fmtM(e.years.reduce((a,y)=>a+y.net,0)),e.payback?`ماه ${fa(e.payback)}`:'—',fmtM(e.minCash.cash)]});
+   const base=S.E.years[0].net;
+   const sens=[['قیمت',{priceMul:.9},{priceMul:1.1}],['حجم فروش',{unitMul:.9},{unitMul:1.1}],['هزینه‌های ثابت',{fixedMul:1.1},{fixedMul:.9}],['هزینه‌ی مستقیم هر واحد',{varMul:1.1},{varMul:.9}]]
+     .map(([n,a,b])=>{const ea=runEngine(p,a).years[0].net-base,eb=runEngine(p,b).years[0].net-base;return {n,ea,eb,w:Math.abs(ea)+Math.abs(eb)}}).sort((x,y)=>y.w-x.w);
+   return el('div',null,table(['سناریو','درآمد سال اول','سود سال اول','سود ۳ ساله','بازگشت','کمترین نقد'],rows,[1,2,3,4,5]),
+     el('p',{class:'small muted',text:'بدبینانه: فروش ۷۰٪ و قیمت ۹۰٪. خوش‌بینانه: فروش ۱۱۵٪ (تا سقف ظرفیت).'}),
+     el('h3',{text:'اثر ±۱۰٪ هر متغیر بر سود سال اول'}),table(['متغیر','۱۰٪ بدتر','۱۰٪ بهتر'],sens.map(s=>[s.n,fmtM(s.ea),fmtM(s.eb)]),[1,2]))},
+ glossary(){const E=S.E;return table(['شاخص','تعریف (در هر پنج ستون یکی است)','مقدار'],[
+   ['نقطه سربه‌سر','هزینه‌ی ثابت ماهانه ÷ سود هر واحد پس از هزینه‌ی مستقیم، کارمزد و حقوق درصدی',Number.isFinite(E.bep)?fa1(E.bep):'—'],
+   ['بازگشت سرمایه','اولین ماهی که جمع (سود خالص + استهلاک) از سرمایه‌ی اولیه بیشتر می‌شود',E.payback?fa(E.payback):'—'],
+   ['ROI سال اول','سود خالص سال اول ÷ سرمایه‌ی اولیه',pct(E.roiY1)],
+   ['هزینه‌ی جذب مشتری','بودجه‌ی بازاریابی ماهانه ÷ مشتری جدید لازم در ماه',E.cac===null?'—':fmtM(E.cac)],
+   ['حاشیه‌ی خالص','سود خالص ÷ درآمد',pct(E.years[0].rev?E.years[0].net/E.years[0].rev:null)],
+   ['کمترین نقدینگی','پایین‌ترین موجودی نقد پایان ماه در ۳۶ ماه',fmtM(E.minCash.cash)]])}
+};
+
+/* ================= AI output rendering + guards ================= */
+function renderBlocks(blocks){return (blocks||[]).map(b=>{try{
+  if(b.t==='p')return el('p',{text:String(b.text||'')});
+  if(b.t==='list')return el('ul',null,(b.items||[]).map(i=>el('li',{text:String(i)})));
+  if(b.t==='steps')return el('ol',null,(b.items||[]).map(i=>el('li',{text:String(i)})));
+  if(b.t==='check')return el('ul',{class:'chk'},(b.items||[]).map(i=>el('li',{text:String(i)})));
+  if(b.t==='table')return table((b.head||[]).map(String),(b.rows||[]).map(r=>(r||[]).map(c=>String(c??''))));
+  if(b.t==='note')return el('div',{class:'note '+(b.tone==='warn'?'warn':'info'),text:String(b.text||'')});
+  return el('p',{text:String(b.text||'')});}catch(e){return null}})}
+function blocksText(blocks){return (blocks||[]).map(b=>b.t==='table'?[(b.head||[]).join(' | '),...(b.rows||[]).map(r=>(r||[]).join(' | '))].join('\n'):b.items?b.items.join('\n'):String(b.text||'')).join('\n')}
+function normDigits(s){return s.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/٫/g,'.').replace(/[٬,](?=\d{3})/g,'')}
+function knownNumbers(){const set=[];const push=v=>{v=Math.abs(n0(v));if(v>0)set.push(v)};
+  const walk=(o,scale)=>{if(o==null)return;if(typeof o==='number'){push(o);if(scale)push(o*1e6)}else if(Array.isArray(o))o.forEach(x=>walk(x,scale));else if(typeof o==='object')Object.values(o).forEach(x=>walk(x,scale))};
+  walk(S.profile,false);const ef=engineForPrompt();delete ef.هشدارها;walk(ef,true);return set}
+function numberFlags(text){const t=normDigits(text);const known=knownNumbers();const out=[];const re=/(\d+(?:\.\d+)?)\s*(میلیارد|میلیون|هزار|٪|%)?/g;let m;
+  while((m=re.exec(t))){const x=parseFloat(m[1]);const unit=m[2]||'';
+    if(!unit&&x<1000)continue;if(!unit&&x>=1390&&x<=1420)continue;if(!unit&&x>=2020&&x<=2040)continue;
+    const c=unit==='میلیارد'?[x*1e9,x]:unit==='میلیون'?[x*1e6,x]:unit==='هزار'?[x*1e3,x]:unit?[x,x/100]:[x];
+    if(!c.some(v=>known.some(k=>Math.abs(k-v)<=Math.max(0.02*k,0.051))))out.push(m[0].trim())}
+  return [...new Set(out)].slice(0,8)}
+function leakFlags(text){const own=S.profile.name+' '+S.profile.city;const words=[];
+  return [...new Set(words)].filter(w=>text.includes(w))}
+
+/* ================= prompts ================= */
+const STATUS={yes:'دارد',wip:'در حال اقدام',no:'ندارد'};
+function profileForPrompt(){const p=S.profile;return {
+  نام:p.name,نوع_کسب‌وکار:p.bizType||'[وارد نشده]',کشور:(COUNTRIES[p.country]||COUNTRIES.OT).label,مکان:p.city,مرحله:{idea:'ایده',active:'فعال',growth:'در حال توسعه'}[p.stage],
+  توضیح:p.description,مالک:p.owner,سابقه_مالک:p.ownerBio||'[وارد نشده]',مشتریان:p.customers,رقبا:p.competitors,مزیت_از_نگاه_مالک:p.advantage,اهداف:p.goals,
+  واحد_فروش:p.unitName,فصل_اوج:p.season==='none'?'ندارد':{spring:'بهار',summer:'تابستان',autumn:'پاییز',winter:'زمستان'}[p.peak],
+  نیروها:(p.staff||[]).map(s=>({نقش:s.role})),هزینه‌های_ثابت:(p.fixedCosts||[]).map(c=>({نام:c.name,مبلغ_تومان:n0(c.amount)})),
+  مجوزها_و_الزامات:(p.reqs||[]).map(x=>({مورد:x.name,وضعیت:STATUS[x.status],اجباری:!!x.critical}))}}
+function engineForPrompt(){const E=S.E,p=S.profile;const M=v=>Math.round(n0(v)/1e5)/10;return {
+  توضیح:'مبالغ به میلیون تومان',واحد:p.unitName,ظرفیت_ماهانه:n0(p.capacity)||'بدون سقف',قیمت_هر_واحد:M(p.price),
+  امروز:{فروش_ماهانه:n0(p.currentUnits),درآمد_ماهانه:M(E.today.rev),سود_عملیاتی_ماهانه:M(E.today.ebitda)},
+  هدف:{فروش_ماهانه:n0(p.targetUnits),ماه_تا_هدف:n0(p.rampMonths),درآمد_ماهانه:M(E.target.rev),سود_عملیاتی_ماهانه:M(E.target.ebitda)},
+  سربه‌سر_واحد_در_ماه:Number.isFinite(E.bep)?Math.round(E.bep*10)/10:null,سود_هر_واحد:M(E.cpu),هزینه_ثابت_ماهانه:M(E.fixedMonthly),
+  سال‌ها:E.years.map(y=>({سال:y.y+1,درآمد:M(y.rev),سود_خالص:M(y.net),حاشیه_درصد:y.rev?Math.round(y.net/y.rev*100):null,نقد_پایان:M(y.cash)})),
+  ماه_بازگشت_سرمایه:E.payback,ROI_سال_اول_درصد:E.roiY1===null?null:Math.round(E.roiY1*100),کمترین_نقدینگی:M(E.minCash.cash),ماه_کمترین_نقدینگی:E.minCash.t,
+  بودجه_بازاریابی_ماهانه:M(E.marketing),مشتری_جدید_لازم_در_ماه:Math.round(E.newCust*10)/10,هزینه_جذب_مشتری:E.cac===null?null:M(E.cac),
+  هشدارها:S.W.map(w=>w.text)}}
+const RULES=`تو تحلیلگر ارشد کسب‌وکار هستی و بخشی از یک گزارش حرفه‌ای فارسی را برای مالک یک کسب‌وکار کوچک می‌نویسی. این کسب‌وکار می‌تواند از هر نوعی باشد؛ متن را دقیقاً برای «نوع کسب‌وکار» پرونده بنویس.
+قوانین قطعی:
+۱. هیچ عدد مالی نساز. فقط اعداد «موتور» یا «پرونده» را به کار ببر (مبالغ موتور به میلیون تومان است؛ بنویس «۳۴٫۲ میلیون تومان»). اگر عددی لازم است و نیست، بنویس [داده لازم: ...].
+۲. هیچ تحقیق، مصاحبه، آمار بازار یا منبعی را که در پرونده نیامده ادعا نکن. هر فرض را با «(فرض)» علامت بزن و بگو چطور سنجیده شود.
+۳. درباره‌ی رقبا فقط از اطلاعات پرونده و با لحن بی‌طرف بنویس.
+۴. لحن حرفه‌ای، ساده و بدون اغراق. از «کاملاً شدنی» و «بی‌ریسک» پرهیز کن.
+۵. محدودیت‌های کشور را رعایت کن و ابزاری را که در کشور مالک قابل استفاده نیست توصیه نکن.
+۶. هشدارهای موتور واقعی‌اند؛ در بخش‌های مرتبط منعکس‌شان کن.
+۷. مرز ستون را رعایت کن: موضوع ستون دیگر را فقط خلاصه کن و ارجاع بده.`;
+const FORMAT=`فقط یک شیء JSON برگردان، بدون هیچ متن دیگری:
+{"sections":[{"no":شماره بخش,"blocks":[...]}]}
+انواع بلوک: {"t":"p","text":"..."} | {"t":"list","items":["..."]} | {"t":"steps","items":["..."]} | {"t":"check","items":["..."]} | {"t":"table","head":["..."],"rows":[["..."]]} | {"t":"note","tone":"warn","text":"..."}
+برای هر بخش ۲ تا ۵ بلوک. متن‌ها فارسی، کوتاه و دقیق.`;
+function context(){const c=COUNTRIES[S.profile.country]||COUNTRIES.OT;
+  return `# کشور و محدودیت‌ها\n${c.label}: ${c.notes}\n\n# پرونده کسب‌وکار (داده‌ی مالک)\n${JSON.stringify(profileForPrompt())}\n\n# خروجی موتور مالی (تنها منبع مجاز اعداد مالی)\n${JSON.stringify(engineForPrompt())}`}
+function genPrompt(col,chunk){
+  return `${RULES}\n\n${context()}\n\n# ستون ${col.id}: ${col.title}\nهدف ستون: ${col.purpose}\nمرز ستون: ${col.boundary}\n\n# بخش‌هایی که باید بنویسی\n${chunk.map(s=>`## بخش ${s.no}: ${s.t}\nهدف: ${s.ex}\nباید شامل باشد: ${(s.must||[]).join('؛ ')}${s.k==='mix'?'\n(جدول موتور این بخش جدا نمایش داده می‌شود؛ تکرارش نکن، فقط تفسیر کن.)':''}`).join('\n\n')}\n\n# قالب خروجی\n${FORMAT}`}
+function colText(cid){const col=COLS.find(c=>c.id===cid);const o=S.out[cid]||{};return col.sections.filter(s=>o[s.no]).map(s=>`## ${s.no}. ${s.t}\n${blocksText(o[s.no].blocks)}`).join('\n\n').slice(0,40000)}
+function reviewPrompt(cid){const col=COLS.find(c=>c.id===cid);const o=S.out[cid]||{};
+  const flags=col.sections.filter(s=>o[s.no]&&(o[s.no].nums.length||o[s.no].leak.length)).map(s=>`بخش ${s.no}: اعداد بدون منبع [${o[s.no].nums.join('، ')}] ${o[s.no].leak.length?'نشت نام: '+o[s.no].leak.join('، '):''}`);
+  return `تو بازبین سخت‌گیر گزارش‌های کسب‌وکار هستی. ستون «${col.title}» را ارزیابی کن.
+معیارها: سازگاری با اعداد موتور؛ نبود داده یا تحقیق ساختگی؛ واقع‌گرایی؛ کاربردی بودن برای این نوع کسب‌وکار؛ رعایت محدودیت‌های کشور؛ بی‌طرفی.
+ضعف‌های خود کسب‌وکار (مثل زیان امروز یا مجوز ناقص) را هم به‌عنوان issue گزارش کن، نه فقط ضعف متن.
+
+${context()}
+
+# پرچم‌های خودکار
+${flags.join('\n')||'ندارد'}
+
+# متن ستون
+${colText(cid)}
+
+فقط یک JSON برگردان:
+{"score":عدد ۰ تا ۱۰۰,"issues":[{"severity":"critical|high|medium|low","section":شماره,"text":"..."}],"strengths":["..."],"summary":"دو جمله"}`}
+function planPrompt(){const E=S.E;const path=E.rows.slice(0,12).map(r=>({ماه:calName(r.t),فروش:Math.round(r.units*10)/10,سود_خالص_میلیون:Math.round(r.net/1e5)/10}));
+  const issues=Object.entries(S.reviews).flatMap(([cid,r])=>(r.issues||[]).map(i=>`[ستون ${cid}][${i.severity}] ${i.text}`)).slice(0,25);const V=verdict();
+  return `${RULES}
+
+«برنامه‌ی پیشرفت» عملی بنویس: مسیر از امروز به هدف در چهار مرحله: ۳۰ روز، ۶۰ روز، ۹۰ روز و تا ۱۲ ماه.
+هر مرحله: هدف روشن، ۳ تا ۵ اقدام (با مسئول و شماره‌ی ستون مرتبط از ۱ تا ۵)، و ۲ تا ۳ شاخص با آستانه‌ی سبز/زرد/قرمز.
+اول موانع پیش از اجرا (الزامات اجباری ناقص)، کمبود نقدینگی و زیان امروز را هدف بگیر. قوانین توقف یا تغییر مسیر را با عدد بنویس.
+
+${context()}
+
+# مسیر ۱۲ ماهه‌ی مدل
+${JSON.stringify(path)}
+# حکم فعلی
+${V.label}: ${V.why.join('؛ ')}
+# مشکلات بازبینی ستون‌ها
+${issues.join('\n')||'بازبینی هنوز انجام نشده'}
+
+فقط یک JSON برگردان:
+{"headline":"یک جمله","phases":[{"title":"۳۰ روز اول","goal":"...","actions":[{"text":"...","owner":"...","column":1}],"kpis":[{"name":"...","green":"...","yellow":"...","red":"..."}]}],"stop_rules":["..."]}`}
+
+/* ================= Claude calls ================= */
+async function getSample(){if(SAMPLE)return SAMPLE;if(!window.claude||!window.claude.use)return null;SAMPLE_P=SAMPLE_P||window.claude.use('sample');SAMPLE=await SAMPLE_P;return SAMPLE}
+const ERR={not_granted:'اجازه‌ی استفاده از Claude داده نشد. برای نوشتن متن، صفحه را دوباره باز کنید و اجازه بدهید.',rate_limited:'درخواست‌ها زیاد شد. یک دقیقه صبر کنید و دوباره بزنید.',invalid_json:'پاسخ Claude قابل خواندن نبود. دوباره امتحان کنید.',cancelled:'متوقف شد.',prompt_too_large:'داده‌ها برای یک درخواست زیاد است.'};
+const errText=e=>ERR[e&&e.code]||('خطا: '+((e&&e.message)||e));
+function setProg(items){S.progress=items;const b=$('progBox');if(b)b.replaceChildren(progressList());else render()}
+function progressList(){return el('ul',{class:'prog'},(S.progress||[]).map(x=>el('li',null,el('strong',{text:x.label+': '}),x.st)))}
+
+async function writeColumn(cid,prog){const col=COLS.find(c=>c.id===cid);const sample=await getSample();if(!sample)throw {message:'Claude در این نما در دسترس نیست؛ صفحه را داخل Claude باز کنید.'};
+  const ai=col.sections.filter(s=>s.k!=='engine');const chunks=[];for(let i=0;i<ai.length;i+=4)chunks.push(ai.slice(i,i+4));
+  S.out[cid]={};delete S.reviews[cid];
+  for(let i=0;i<chunks.length;i++){prog.st=`نوشتن (${fa(i+1)} از ${fa(chunks.length+1)})…`;setProg(S.progress);
+    const res=await sample.json(genPrompt(col,chunks[i]),{signal:CTL.signal,modelTier:'default'});
+    for(const s of (res&&res.sections)||[]){const no=n0(s.no);if(!chunks[i].some(c=>c.no===no))continue;const txt=blocksText(s.blocks);S.out[cid][no]={blocks:s.blocks||[],nums:numberFlags(txt),leak:leakFlags(txt)}}}
+  prog.st=`بازبینی (${fa(chunks.length+1)} از ${fa(chunks.length+1)})…`;setProg(S.progress);
+  const r=await sample.json(reviewPrompt(cid),{signal:CTL.signal,modelTier:'default'});
+  S.reviews[cid]={score:Math.max(0,Math.min(100,n0(r.score))),issues:Array.isArray(r.issues)?r.issues:[],strengths:Array.isArray(r.strengths)?r.strengths:[],summary:String(r.summary||'')};
+  prog.st=`تمام شد · امتیاز ${fa(S.reviews[cid].score)}`;setProg(S.progress);await saveOut(cid)}
+async function writePlan(prog){const sample=await getSample();if(!sample)throw {message:'Claude در این نما در دسترس نیست.'};
+  prog.st='در حال نوشتن…';setProg(S.progress);
+  const r=await sample.json(planPrompt(),{signal:CTL.signal,modelTier:'default'});
+  S.plan={headline:String(r.headline||''),phases:Array.isArray(r.phases)?r.phases:[],stop_rules:Array.isArray(r.stop_rules)?r.stop_rules:[],at:Date.now()};
+  prog.st='تمام شد';setProg(S.progress);await savePlan()}
+async function runJob(steps){if(S.busy)return;S.busy=true;CTL=new AbortController();if(DB&&!S.fresh){clearTimeout(saveTimer);queue(saveProj)}
+  S.progress=steps.map(s=>({label:s.label,st:'در صف',fn:s.fn}));render();
+  try{for(const pr of S.progress){await pr.fn(pr)}toast('انجام شد.')}
+  catch(e){toast(errText(e));const k=S.progress.find(x=>/…$/.test(x.st));if(k)k.st=e&&e.code==='cancelled'?'متوقف شد':'خطا'}
+  finally{S.busy=false;CTL=null;render()}}
+const jobColumn=cid=>runJob([{label:`ستون ${fa(cid)}: ${COLS[cid-1].title}`,fn:pr=>writeColumn(cid,pr)}]);
+const jobPlan=()=>runJob([{label:'برنامه پیشرفت',fn:writePlan}]);
+const jobAll=()=>runJob([...COLS.map(c=>({label:`ستون ${fa(c.id)}: ${c.title}`,fn:pr=>writeColumn(c.id,pr)})),{label:'برنامه پیشرفت',fn:writePlan}]);
+
+/* ================= verdict ================= */
+function verdict(){const D=S.D;const why=[];let cls='go',label='اجرا';
+  const rev=COLS.map(c=>S.reviews[c.id]?S.reviews[c.id].score:null).filter(v=>v!==null);
+  const parts=[D.fin,...rev];if(D.legal!==null)parts.push(D.legal);const avg=Math.round(parts.reduce((a,b)=>a+b,0)/parts.length);
+  if(D.blockers.length){cls='stop';label='مانع پیش از اجرا';why.push('الزام اجباری که وجود ندارد: '+D.blockers.join('، '))}
+  if(S.E.minCash.cash<0){if(cls!=='stop'){cls='stop';label='کمبود نقدینگی'}why.push(`نقدینگی در ماه ${fa(S.E.minCash.t)} منفی می‌شود`)}
+  if(D.pendingCritical.length){if(cls==='go'){cls='cond';label='اجرا با شرط'}why.push('الزام اجباری در حال اقدام: '+D.pendingCritical.join('، '))}
+  if(D.fin<50){if(cls==='go'){cls='cond';label='اصلاح مدل مالی'}why.push(`امتیاز مالی ${fa(D.fin)} زیر کف ۵۰`)}
+  if(cls==='go'){if(avg<55){cls='stop';label='بازطراحی'}else if(avg<70){cls='cond';label='اجرا با اصلاحات'}}
+  why.push(`میانگین امتیازها ${fa(avg)} از ۱۰۰`+(rev.length<5?` (${fa(5-rev.length)} ستون هنوز نوشته و بازبینی نشده)`:''));
+  return {cls,label,why,avg}}
+
+/* ================= persistence ================= */
+let saveTimer=null,saving=Promise.resolve();
+function setSave(t){$('saveState').textContent=t}
+function colPath(){return 'data/users/'+UID}
+function queue(fn){saving=saving.then(fn).catch(e=>{setSave('ذخیره نشد');console.warn(e)});return saving}
+function scheduleSave(){if(!DB||S.fresh)return;setSave('تغییرات ذخیره نشده');clearTimeout(saveTimer);saveTimer=setTimeout(()=>queue(saveProj),1500)}
+async function saveProj(){if(!DB)return;setSave('در حال ذخیره…');await DB.collection(colPath()).doc('proj_'+S.pid).set({name:S.profile.name,profile:S.profile,exampleKey:S.exampleKey||null,updatedAt:Date.now()});setSave('ذخیره شد');refreshProjList(false)}
+function saveOut(cid){if(!DB)return Promise.resolve();return queue(async()=>{await DB.collection(colPath()).doc(`out_${S.pid}_${cid}`).set({out:S.out[cid]||{},review:S.reviews[cid]||null,updatedAt:Date.now()});setSave('ذخیره شد')})}
+function savePlan(){if(!DB)return Promise.resolve();return queue(async()=>{await DB.collection(colPath()).doc(`plan_${S.pid}`).set({plan:S.plan,updatedAt:Date.now()});setSave('ذخیره شد')})}
+async function refreshProjList(loadLatest){if(!DB)return;try{const snap=await DB.collection(colPath()).get();
+  S.projects=snap.docs.filter(d=>d.id.startsWith('proj_')).map(d=>({id:d.id.slice(5),name:(d.data()||{}).name||'بی‌نام',at:(d.data()||{}).updatedAt||0})).sort((a,b)=>b.at-a.at);
+  renderProjSel();if(loadLatest&&S.projects.length)await loadProject(S.projects[0].id)}catch(e){console.warn(e)}}
+async function loadProject(pid){if(!DB)return;const col=DB.collection(colPath());const data=(await col.doc('proj_'+pid).get()).data();if(!data)return;
+  S.pid=pid;S.profile=Object.assign(clone(BASE),data.profile);S.exampleKey=data.exampleKey||null;S.out={};S.reviews={};S.plan=null;S.progress=null;
+  for(const c of COLS){const o=(await col.doc(`out_${pid}_${c.id}`).get()).data();if(o){S.out[c.id]=o.out||{};if(o.review)S.reviews[c.id]=o.review}}
+  const pl=(await col.doc(`plan_${pid}`).get()).data();if(pl)S.plan=pl.plan;
+  S.fresh=false;recompute();renderProjSel();setSave('بارگذاری شد');render()}
+function renderProjSel(){const sel=$('projSel');sel.replaceChildren();const list=S.projects.some(x=>x.id===S.pid)||S.fresh?S.projects:[{id:S.pid,name:S.profile.name},...S.projects];
+  if(S.fresh)sel.append(el('option',{value:'',text:'پروژه‌های ذخیره‌شده…'}));list.forEach(x=>sel.append(el('option',{value:x.id,selected:x.id===S.pid?true:null,text:x.name})));sel.hidden=list.length<(S.fresh?1:2)}
+function startProject(key){if(S.busy)return;S.pid=newId();S.profile=makeProfile(key);S.exampleKey=key||null;S.out={};S.reviews={};S.plan=null;S.progress=null;S.fresh=false;recompute();S.view='profile';renderProjSel();render();if(DB)queue(saveProj);window.scrollTo({top:0})}
+
+/* ================= header / nav ================= */
+function colStatus(cid){const col=COLS.find(c=>c.id===cid);const ai=col.sections.filter(s=>s.k!=='engine').length;const done=Object.keys(S.out[cid]||{}).length;const rev=!!S.reviews[cid];
+  return {frac:rev?1:ai?0.15+0.6*done/ai:1,done,ai,rev}}
+function renderPillars(){const box=$('pillars');box.replaceChildren();COLS.forEach(c=>{const st=colStatus(c.id);
+  box.append(el('button',{class:'pl'+(st.rev?' done':'')+(S.view==='col-'+c.id?' cur':''),'aria-label':`ستون ${c.id}: ${c.title}`,onclick:()=>go('col-'+c.id)},
+    el('span',{class:'fill',style:`height:${Math.round(st.frac*100)}%`}),el('span',{class:'lbl'},el('b',{text:fa(c.id)}),el('span',{text:c.title}))))})}
+function renderNav(){const nav=$('nav');nav.replaceChildren();const item=(v,label,badge)=>el('button',{class:S.view===v?'on':null,onclick:()=>go(v)},el('span',{text:label}),badge?el('span',{class:'badge',text:badge}):null);
+  const hi=S.W.filter(w=>w.sev==='critical'||w.sev==='high').length;
+  nav.append(el('div',{class:'grp',text:'داده'}),item('start','شروع / نوع کسب‌وکار'),item('profile','پرونده کسب‌وکار'),item('numbers','اعداد و هشدارها',hi?fa(hi)+' هشدار':''),
+    el('div',{class:'grp',text:'پنج ستون'}),...COLS.map(c=>{const st=colStatus(c.id);return item('col-'+c.id,`${fa(c.id)}. ${c.title}`,st.rev?fa(S.reviews[c.id].score):st.done?'نیمه‌کاره':'')}),
+    el('div',{class:'grp',text:'نتیجه'}),item('result','حکم و برنامه پیشرفت'))}
+function go(v){S.view=v;render();window.scrollTo({top:0})}
+
+/* ================= profile ================= */
+function field(label,key,type,opt){opt=opt||{};const p=S.profile;const id='f_'+key;let input;
+  const hint=el('div',{class:'hint'});const upd=()=>{if(opt.money)hint.textContent=n0(p[key])?fmtM(p[key])+' تومان':''};
+  const onch=v=>{p[key]=type==='number'?(v===''?0:Number(v)):v;upd();changed()};
+  if(type==='select')input=el('select',{id,onchange:e=>onch(e.target.value)},Object.entries(opt.options).map(([k,v])=>el('option',{value:k,selected:String(p[key])===String(k)?true:null,text:v})));
+  else if(type==='textarea'){input=el('textarea',{id,oninput:e=>onch(e.target.value)});input.value=p[key]||''}
+  else{input=el('input',{id,type,step:'any',list:opt.list||null,inputmode:type==='number'?'decimal':null,oninput:e=>onch(e.target.value)});input.value=p[key]??''}
+  upd();return el('div',{class:'field'+(opt.wide?' wide':'')},el('label',{for:id,text:label}),input,opt.help?el('div',{class:'hint',text:opt.help}):hint)}
+function editTable(key,cols,blank){const p=S.profile;p[key]=p[key]||[];const wrap=el('div');
+  const cell=(row,c,ri)=>{let inp;const id=`t_${key}_${ri}_${c.key}`;const set=v=>{row[c.key]=c.type==='number'?n0(v):v;changed()};
+    if(c.type==='select')inp=el('select',{id,onchange:e=>set(e.target.value),'aria-label':c.label},Object.entries(c.options).map(([k,v])=>el('option',{value:k,selected:row[c.key]===k?true:null,text:v})));
+    else if(c.type==='check'){inp=el('input',{id,type:'checkbox','aria-label':c.label,onchange:e=>set(e.target.checked)});inp.checked=!!row[c.key]}
+    else{inp=el('input',{id,type:c.type||'text',step:'any','aria-label':c.label,oninput:e=>set(e.target.value)});inp.value=row[c.key]??''}
+    return el('td',null,inp)};
+  const draw=()=>{wrap.replaceChildren(el('div',{class:'tblwrap'},el('table',{class:'edit'},el('thead',null,el('tr',null,cols.map(c=>el('th',{text:c.label})),el('th'))),
+      el('tbody',null,p[key].map((row,ri)=>el('tr',null,cols.map(c=>cell(row,c,ri)),el('td',null,el('button',{class:'btn small','aria-label':'حذف ردیف',onclick:()=>{p[key].splice(ri,1);changed();draw()}},'×'))))))),
+    el('button',{class:'btn small',style:'margin-top:8px',onclick:()=>{p[key].push(clone(blank));changed();draw()}},'افزودن ردیف'))};
+  draw();return wrap}
+function grp(title,sub,open,...kids){return el('details',{class:'grp',open:open?true:null},el('summary',null,el('span',{text:title}),el('span',{class:'muted',text:sub||''})),el('div',{class:'inner'},kids))}
+function changed(){recompute();scheduleSave();renderPillars();renderNav();const w=$('liveWarn');if(w)w.replaceChildren(warnSummary())}
+function warnSummary(){const hi=S.W.filter(w=>w.sev==='critical'||w.sev==='high');
+  return hi.length?el('div',{class:'note warn'},`اعداد ${fa(hi.length)} هشدار مهم دارند. `,el('a',{href:'#',onclick:e=>{e.preventDefault();go('numbers')}},'دیدن هشدارها')):el('div',{class:'note ok',text:'اعداد هشدار مهمی ندارند.'})}
+function templateNote(){const k=S.exampleKey;if(!k)return null;
+  return el('div',{class:'note info',text:`اعداد از الگوی «${(TEMPLATES[k]||TEMPLATES.other).label}» پر شده‌اند و فقط نقطه‌ی شروع‌اند. آن‌ها را با اعداد واقعی کسب‌وکارتان عوض کنید. مجوزها تا وقتی «دارد» نزنید، «ندارد» حساب می‌شوند.`})}
+function viewStart(){return el('div',null,el('h1',{text:'چه کسب‌وکاری دارید؟'}),
+  el('p',{class:'lead',text:'یک نوع را انتخاب کنید. فرم با اعداد معمول همان کسب‌وکار پر می‌شود تا فقط عددهای خودتان را جایگزین کنید. بعد Claude پنج ستون را برایتان می‌نویسد: امکان‌سنجی، بیزینس پلن، بازاریابی، عملیات و مالی.'}),
+  el('div',{class:'examples'},Object.entries(TEMPLATES).map(([k,t])=>el('button',{class:'ex'+(k==='other'?' new':''),onclick:()=>startProject(k)},el('b',{text:t.label}),el('span',{text:k==='other'?'فرم خالی':`واحد فروش: ${t.p.unitName}`})))),
+  S.projects.length?el('p',{class:'small muted',text:'پروژه‌های ذخیره‌شده‌تان از فهرست بالای صفحه باز می‌شوند.'}):null)}
+function viewProfile(){const p=S.profile;const u=p.unitName||'واحد';
+  return el('div',null,el('h1',{text:'پرونده کسب‌وکار'}),
+    el('p',{class:'lead',text:'برای هر نوع کسب‌وکاری کار می‌کند. هر عدد فقط یک بار این‌جا وارد می‌شود و هر پنج ستون از همین پرونده می‌خوانند. فیلد خالی در گزارش «داده لازم» می‌شود.'}),
+    templateNote(),
+    el('div',{id:'liveWarn'},warnSummary()),
+    grp('۱. معرفی','نام، نوع، مشتری، رقبا',true,el('div',{class:'fgrid'},field('نام کسب‌وکار','name','text'),field('نوع کسب‌وکار','bizType','text',{help:'مثلاً کافه، آرایشگاه، فروشگاه آنلاین، آموزشگاه'}),
+      field('کشور','country','select',{options:Object.fromEntries(Object.entries(COUNTRIES).map(([k,v])=>[k,v.label]))}),field('شهر / مکان','city','text'),
+      field('مرحله','stage','select',{options:{idea:'ایده (هنوز شروع نشده)',active:'فعال',growth:'در حال توسعه'}}),field('مالک','owner','text'),
+      field('توضیح کوتاه','description','textarea',{wide:true}),field('مشتریان اصلی','customers','textarea'),field('رقبا','competitors','textarea'),
+      field('مزیت از نگاه شما','advantage','textarea'),field('اهداف','goals','textarea'),field('سابقه‌ی مالک یا تیم (اختیاری)','ownerBio','textarea',{wide:true,help:'اگر خالی بماند، گزارش سابقه‌ای نمی‌سازد.'}))),
+    grp('۲. فروش','واحد، قیمت، امروز و هدف',true,el('div',{class:'fgrid'},field('واحد فروش','unitName','text',{list:'unitList',help:'چیزی که می‌فروشید و می‌شمارید: شب، سفارش، نوبت…'}),
+      field(`قیمت هر ${u} (تومان)`,'price','number',{money:true}),field(`فروش امروز در ماه (${u})`,'currentUnits','number',{help:'برای ایده: فروش ماه اول'}),
+      field(`هدف فروش در ماه (${u})`,'targetUnits','number'),field('چند ماه تا هدف','rampMonths','number'),field(`ظرفیت ماهانه (${u})`,'capacity','number',{help:'صفر یعنی سقف ندارد'}),
+      field(`هر مشتری در هر خرید چند ${u}`,'unitsPerCustomer','number'),field('مشتری تکراری (٪)','repeatPct','number'),
+      field('فصلی بودن فروش','season','select',{options:{none:'ندارد',low:'کم',high:'زیاد'}}),field('فصل اوج','peak','select',{options:{spring:'بهار',summer:'تابستان',autumn:'پاییز',winter:'زمستان'}})),
+      el('datalist',{id:'unitList'},UNIT_SUGGEST.map(x=>el('option',{value:x})))),
+    grp('۳. هزینه‌ها','مستقیم، کارمزد، حقوق، ثابت',true,el('div',{class:'fgrid'},field(`هزینه‌ی مستقیم هر ${u} (تومان)`,'varPerUnit','number',{money:true,help:'مواد، بسته‌بندی، نظافت…'}),field('کارمزد یا کمیسیون فروش (٪)','feePct','number',{help:'پلتفرم‌ها، کارتخوان، واسطه‌ها'})),
+      el('h3',{text:'حقوق و دستمزد'}),editTable('staff',[{key:'role',label:'نقش'},{key:'payType',label:'نوع پرداخت',type:'select',options:{fixed:'ماهانه ثابت',pct:'درصد فروش'}},{key:'amount',label:'مبلغ ماهانه یا درصد',type:'number'}],{role:'',payType:'fixed',amount:0}),
+      el('h3',{text:'هزینه‌های ثابت ماهانه'}),editTable('fixedCosts',[{key:'name',label:'هزینه'},{key:'amount',label:'مبلغ ماهانه (تومان)',type:'number'},{key:'mkt',label:'بازاریابی است',type:'check'}],{name:'',amount:0,mkt:false})),
+    grp('۴. سرمایه','سرمایه، نقد، وام، تورم',false,el('div',{class:'fgrid'},field('سرمایه‌ی اولیه (خرید و تجهیز)','initialInvest','number',{money:true}),field('نقد در دسترس برای شروع','startCash','number',{money:true}),
+      field('وام','loanAmount','number',{money:true}),field('سود وام (٪ سالانه)','loanRate','number'),field('مدت وام (ماه)','loanMonths','number'),
+      field('تورم سالانه (٪)','inflation','number'),field('مالیات بر سود (٪)','taxPct','number'),field('برداشت مالک از سود (٪)','ownerDrawPct','number'),
+      field('ماه شروع','startMonth','select',{options:Object.fromEntries(MONTHS.map((m,i)=>[i,m]))}),field('سال شروع','startYear','number'))),
+    grp('۵. مجوزها و الزامات','مجوز، ایمنی، بیمه، بهداشت',false,el('p',{class:'small muted',text:'هر موردی را که «اجباری» علامت بزنید و «ندارد» باشد، مانع پیش از اجرا حساب می‌شود.'}),
+      editTable('reqs',[{key:'name',label:'مورد'},{key:'status',label:'وضعیت',type:'select',options:STATUS},{key:'critical',label:'اجباری',type:'check'}],{name:'',status:'no',critical:true})),
+    el('div',{class:'row',style:'margin-top:16px'},el('button',{class:'btn pri',onclick:()=>go('numbers')},'دیدن اعداد'),el('button',{class:'btn',onclick:()=>go('result')},'رفتن به نتیجه')))}
+
+/* ================= numbers ================= */
+function warnTable(){const order={critical:0,high:1,medium:2,low:3};return S.W.length?el('div',{class:'card'},table(['شدت','هشدار'],[...S.W].sort((a,b)=>order[a.sev]-order[b.sev]).map(w=>[sevChip(w.sev),w.text]))):el('div',{class:'note ok',text:'هشداری نیست.'})}
+function viewNumbers(){return el('div',null,el('h1',{text:'اعداد و هشدارها'}),el('p',{class:'lead',text:'مدل ماه‌به‌ماه ۳۶ ماهه از امروز تا هدف. همه‌ی عددهای گزارش فقط از همین‌جا می‌آیند و Claude فقط تفسیرشان می‌کند.'}),
+  el('h2',{text:'هشدارها'}),warnTable(),el('h2',{text:'امروز، سربه‌سر، هدف'}),ER.finSummary(),
+  el('h2',{text:'سناریوها'}),el('div',{class:'card'},ER.scenarios()),el('h2',{text:'سه سال'}),el('div',{class:'card'},ER.years()),el('h2',{text:'۱۲ ماه اول'}),el('div',{class:'card'},ER.monthly()))}
+
+/* ================= column ================= */
+function progCard(){return S.progress?el('div',{class:'card',id:'progBox'},progressList()):null}
+function reviewCard(rv){return el('div',{class:'card'},el('div',{class:'row'},el('strong',{text:`امتیاز بازبینی: ${fa(rv.score)} از ۱۰۰`}),el('div',{class:'bar',style:'flex:1;max-width:260px'},el('i',{class:rv.score<55?'low':rv.score<70?'mid':null,style:`width:${rv.score}%`}))),
+  el('p',{text:rv.summary}),rv.issues.length?table(['شدت','بخش','مشکل'],rv.issues.map(i=>[sevChip(i.severity),i.section?fa(i.section):'—',String(i.text||'')])):null,
+  rv.strengths.length?el('div',null,el('h3',{text:'نقاط قوت'}),el('ul',null,rv.strengths.map(s=>el('li',{text:String(s)})))):null)}
+function viewColumn(cid){const col=COLS.find(c=>c.id===cid);const o=S.out[cid]||{};const st=colStatus(cid);const rv=S.reviews[cid];
+  return el('div',null,el('h1',{text:`ستون ${fa(cid)}: ${col.title}`}),el('p',{class:'lead',text:col.purpose}),
+    el('div',{class:'row'},el('button',{class:'btn pri',disabled:S.busy?true:null,onclick:()=>jobColumn(cid)},st.done?'بازنویسی این ستون':'نوشتن این ستون با Claude'),
+      S.busy?el('button',{class:'btn warn',onclick:()=>CTL&&CTL.abort()},'توقف'):null,
+      el('span',{class:'small muted',text:`${fa(st.done)} از ${fa(st.ai)} بخش متنی نوشته شده · حدود ${fa(Math.ceil(st.ai/4)+1)} درخواست`})),
+    progCard(),rv?reviewCard(rv):null,
+    el('div',{style:'margin-top:16px'},col.sections.map(s=>{const o2=o[s.no];const kind=s.k==='engine'?'از اعداد':s.k==='mix'?'اعداد + Claude':'Claude';
+      return el('section',{class:'sec'},el('header',null,el('span',{class:'no',text:fa(s.no)}),el('span',{class:'ttl',text:s.t}),el('span',{class:'kind',text:kind})),
+        el('div',{class:'body'},s.engine?ER[s.engine]():null,s.k!=='engine'?(o2?[...renderBlocks(o2.blocks),o2.leak.length?el('div',{class:'flag leak',text:'نام از نمونه‌ی دیگر: '+o2.leak.join('، ')}):null,o2.nums.length?el('div',{class:'flag nums',text:'عدد بدون منبع در اعداد: '+o2.nums.join('، ')}):null]:el('div',{class:'pending',text:'هنوز نوشته نشده.'})):null))})))}
+
+/* ================= result ================= */
+function viewResult(){const D=S.D,V=verdict(),E=S.E,pl=S.plan;
+  const barRow=(name,v,floor,src)=>[name,v===null?'—':el('div',{class:'row'},el('div',{class:'bar',style:'flex:1'},el('i',{class:v<(floor||55)?'low':v<70?'mid':null,style:`width:${v}%`})),el('span',{text:fa(v)})),floor?fa(floor):'—',src];
+  const rows=[barRow('مالی (از اعداد)',D.fin,50,'محاسبه'),barRow('مجوزها و الزامات',D.legal,null,'محاسبه'),...COLS.map(c=>barRow(`${fa(c.id)}. ${c.title}`,S.reviews[c.id]?S.reviews[c.id].score:null,null,S.reviews[c.id]?'بازبینی Claude':'هنوز نوشته نشده'))];
+  const missing=COLS.filter(c=>!S.reviews[c.id]).length;
+  return el('div',null,el('h1',{text:'حکم و برنامه پیشرفت'}),el('p',{class:'lead',text:'حکم با قانون کف صادر می‌شود: یک مانع کافی است تا حکم عوض شود، هر چقدر میانگین بالا باشد.'}),
+    el('div',{class:'row'},el('button',{class:'btn pri',disabled:S.busy?true:null,onclick:jobAll},missing?'نوشتن هر پنج ستون و برنامه پیشرفت':'بازنویسی همه'),
+      el('button',{class:'btn',disabled:S.busy?true:null,onclick:jobPlan},pl?'بازنویسی برنامه پیشرفت':'فقط برنامه پیشرفت'),
+      S.busy?el('button',{class:'btn warn',onclick:()=>CTL&&CTL.abort()},'توقف'):null,
+      el('span',{class:'small muted',text:'نوشتن همه حدود ۱۵ درخواست و چند دقیقه طول می‌کشد.'})),progCard(),
+    el('div',{class:'verdict '+V.cls,style:'margin-top:16px'},el('div',{class:'small',text:'حکم فعلی'}),el('div',{class:'v',text:V.label}),el('ul',null,V.why.map(w=>el('li',{text:w})))),
+    el('div',{class:'card'},table(['محور','امتیاز','کف','منبع'],rows)),
+    el('p',{class:'small muted',text:`اجزای امتیاز مالی: حاشیه ${fa(D.parts.margin)}، فاصله‌ی سربه‌سر تا ظرفیت ${fa(D.parts.bep)}، بازگشت سرمایه ${fa(D.parts.payback)}، وضعیت امروز ${fa(D.parts.today)}، نقدینگی ${fa(D.parts.cash)}.`}),
+    el('h2',{text:'مسیر ۱۲ ماهه'}),el('div',{class:'card'},lineChart([{name:`${S.profile.unitName} در ماه`,data:E.rows.slice(0,12).map(r=>r.units),color:'var(--pillar)'},{name:'سربه‌سر',data:E.rows.slice(0,12).map(()=>Number.isFinite(E.bep)?E.bep:0),color:'var(--danger)',dash:'5 4'}],E.rows.slice(0,12).map(r=>MONTHS[r.cal]),{label:'مسیر ۱۲ ماهه'})),
+    el('h2',{text:'برنامه پیشرفت'}),
+    pl?el('div',null,el('div',{class:'note info',text:pl.headline}),pl.phases.map(ph=>el('div',{class:'phase'},el('h3',{text:String(ph.title||'')}),el('p',null,el('strong',{text:'هدف: '}),String(ph.goal||'')),
+        (ph.actions||[]).length?table(['اقدام','مسئول','ستون'],ph.actions.map(a=>[String(a.text||''),String(a.owner||''),a.column?fa(a.column):'—'])):null,
+        (ph.kpis||[]).length?el('ul',null,ph.kpis.map(k=>el('li',null,el('strong',{text:String(k.name||'')+' '}),el('span',{class:'tl'},el('span',{class:'g',text:'سبز: '+String(k.green||'')}),el('span',{class:'y',text:'زرد: '+String(k.yellow||'')}),el('span',{class:'r',text:'قرمز: '+String(k.red||'')}))))):null)),
+      pl.stop_rules.length?el('div',{class:'card'},el('h3',{style:'margin-top:0',text:'قوانین توقف یا تغییر مسیر'}),el('ul',null,pl.stop_rules.map(r=>el('li',{text:String(r)})))):null)
+      :el('p',{class:'muted',text:'هنوز ساخته نشده. برای برنامه‌ی دقیق‌تر، اول ستون‌ها را بنویسید؛ دکمه‌ی «نوشتن هر پنج ستون» همه را به ترتیب انجام می‌دهد.'}),
+    el('h2',{text:'موانع و هشدارهای مهم'}),el('div',{class:'card'},table(['شدت','منبع','مورد'],[...S.W.filter(w=>w.sev==='critical'||w.sev==='high').map(w=>[sevChip(w.sev),'اعداد',w.text]),
+      ...Object.entries(S.reviews).flatMap(([cid,r])=>(r.issues||[]).filter(i=>i.severity==='critical'||i.severity==='high').map(i=>[sevChip(i.severity),`ستون ${fa(cid)}`,String(i.text||'')]))])))}
+
+/* ================= export ================= */
+function exportHTML(){const saved=S.view,sp=S.progress;S.progress=null;const snap=v=>{S.view=v;const n=v.startsWith('col-')?viewColumn(+v.slice(4)):VIEWS[v]();n.querySelectorAll('button,.examples,#liveWarn').forEach(b=>b.remove());return n.outerHTML};
+  const parts=[snap('result'),snap('numbers'),...COLS.map(c=>snap('col-'+c.id))];S.view=saved;S.progress=sp;
+  const css=document.querySelector('style').textContent;
+  return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${S.profile.name.replace(/</g,'')} — پنج ستون</title><link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet"><style>${css} main{max-width:980px;margin:0 auto;padding:24px 16px} main>div{margin-bottom:40px;page-break-after:always}</style></head><body><main><h1>${S.profile.name.replace(/</g,'')}</h1>${parts.join('')}</main></body></html>`}
+async function doExport(){if(!DL){toast('دانلود در این نما در دسترس نیست.');return}try{await DL.save({filename:`${S.profile.name.replace(/[\\/:*?"<>|]/g,'')}-5P.html`,data:new Blob([exportHTML()],{type:'text/html'})})}catch(e){if(e&&e.code!=='cancelled'&&e.code!=='declined')toast('فایل ذخیره نشد: '+(e.message||e.code))}}
+
+/* ================= render + boot ================= */
+const VIEWS={start:viewStart,profile:viewProfile,numbers:viewNumbers,result:viewResult};
+function render(){renderPillars();renderNav();const v=S.view;$('main').replaceChildren(v.startsWith('col-')?viewColumn(+v.slice(4)):VIEWS[v]())}
+document.documentElement.lang='fa';document.documentElement.dir='rtl';
+$('newProj').onclick=()=>go('start');
+$('projSel').onchange=e=>{if(!S.busy&&e.target.value)loadProject(e.target.value).then(()=>{if(S.view==='start')go('profile')})};
+$('exportBtn').onclick=doExport;
+S.pid=newId();S.profile=makeProfile('other');S.exampleKey='other';S.fresh=true;S.view='start';recompute();renderProjSel();render();setSave('بدون ذخیره');
+(async()=>{if(!window.claude||!window.claude.use){setSave('ذخیره فقط داخل Claude');return}
+  try{const [db,user,dl]=await Promise.all([window.claude.use('db'),window.claude.use('user'),window.claude.use('downloads')]);DL=dl;$('exportBtn').hidden=!dl;
+    if(db&&user){UID=await user.id();if(UID){DB=db;setSave('');await refreshProjList(false)}}
+    if(!DB)setSave('ذخیره در دسترس نیست')}catch(e){console.warn(e);setSave('ذخیره در دسترس نیست')}
+  getSample()})();
+</script>
+
+</body>
+</html>
