@@ -27,7 +27,7 @@ Die Oberfläche ist auf Persisch (von rechts nach links).
 ## Stand
 
 - Prototyp, funktionsfähig.
-- Komplett getestet mit einer simulierten KI-Schnittstelle (alle fünf Säulen, Urteil, Fortschrittsplan, Speichern, Smartphone-Ansicht). Ein Durchlauf mit dem echten Claude-API-Schlüssel steht noch aus.
+- Komplett getestet mit einer simulierten KI-Schnittstelle (alle fünf Säulen, Urteil, Fortschrittsplan, Speichern, Smartphone-Ansicht), dazu 23 automatische Tests. Ein Durchlauf mit dem echten Claude-API-Schlüssel steht noch aus.
 - Noch keine öffentliche Live-Version. Grund: Jede Analyse kostet API-Guthaben, und es gibt noch keine Benutzeranmeldung.
 
 ## Starten
@@ -43,6 +43,19 @@ npm start
 Dann im Browser öffnen: http://127.0.0.1:3000
 
 Projekte werden im Browser gespeichert. „Bericht herunterladen“ erzeugt eine HTML-Datei mit allen fünf Säulen.
+
+## Tests
+
+```bash
+npm test
+```
+
+23 automatische Tests, ohne echten API-Schlüssel und ohne Kosten:
+
+- **Finanzmodul:** Für alle zehn Vorlagen geht die Bilanz in jedem Monat auf, und die Monate ergeben die Jahressummen. Break-even, Kapazitätsgrenze, Amortisation, Liquiditätswarnung und Pflichtgenehmigungen werden mit festen Zahlen geprüft.
+- **Server:** gegen eine simulierte Claude-API. Geprüft werden normale Antworten, unlesbare Antworten, Ablehnungen, ein fehlender Schlüssel und der Schutz vor Pfad-Tricks.
+
+Die Tests laufen bei jeder Änderung automatisch auf GitHub (GitHub Actions).
 
 ## Aufbau
 
