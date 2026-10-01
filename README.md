@@ -1,10 +1,10 @@
-# 24 Pollar – Unternehmensanalyse in Säulen
+# 5 Pollar – Unternehmensanalyse in fünf Säulen
 
 Umgesetzt mit dem KI-Werkzeug Claude Code (No-Code). Anforderungen, Fachinhalte und Prüfung: Farhad Javanmardi.
 
 ## Was die App macht
 
-Unternehmen geben einmal ihre Grunddaten ein: Art des Geschäfts, Preis, heutiger Absatz, Ziel, Kosten, Kapital, Genehmigungen. Die App analysiert mit KI die ersten 5 von 24 Säulen:
+Unternehmen geben einmal ihre Grunddaten ein: Art des Geschäfts, Preis, heutiger Absatz, Ziel, Kosten, Kapital, Genehmigungen. Die App analysiert mit KI fünf Säulen:
 
 1. **Machbarkeit**: Ist das Vorhaben umsetzbar, und unter welchen Bedingungen?
 2. **Businessplan**: Gesamtbild für Inhaber, Partner oder Investoren
