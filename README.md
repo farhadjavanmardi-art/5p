@@ -2,6 +2,8 @@
 
 Umgesetzt mit dem KI-Werkzeug Claude Code (No-Code). Anforderungen, Fachinhalte und Prüfung: Farhad Javanmardi.
 
+**Live:** [kolbenarenji.com/5p](https://kolbenarenji.com/5p)
+
 ## Was die App macht
 
 Unternehmen geben einmal ihre Grunddaten ein: Art des Geschäfts, Preis, heutiger Absatz, Ziel, Kosten, Kapital, Genehmigungen. Die App analysiert mit KI fünf Säulen:
@@ -28,7 +30,7 @@ Die Oberfläche ist auf Persisch (von rechts nach links).
 
 - Prototyp, funktionsfähig.
 - Komplett getestet mit einer simulierten KI-Schnittstelle (alle fünf Säulen, Urteil, Fortschrittsplan, Speichern, Smartphone-Ansicht), dazu 23 automatische Tests. Ein Durchlauf mit dem echten Claude-API-Schlüssel steht noch aus.
-- Noch keine öffentliche Live-Version. Grund: Jede Analyse kostet API-Guthaben, und es gibt noch keine Benutzeranmeldung.
+- **Live:** [kolbenarenji.com/5p](https://kolbenarenji.com/5p). Formular, Finanzmodul und Urteil funktionieren ohne Schlüssel. Für die KI-Texte trägt jeder Besucher seinen eigenen Claude-API-Schlüssel ein; er bleibt in seinem Browser.
 
 ## Starten
 
