@@ -21,6 +21,7 @@ Am Ende stehen ein **Urteil** (umsetzen / mit Auflagen / Hindernis vor dem Start
 - **Für jede Branche:** Zehn Vorlagen (Café, Restaurant, Friseursalon, Laden, Schule, Unterkunft, Dienstleistung, Online-Abo, Produktion, Sonstiges) füllen das Formular mit typischen Startwerten. Die Werte sind ausdrücklich als Beispiele gekennzeichnet und werden durch die eigenen Zahlen ersetzt.
 - **Zahlen rechnet der Code, nicht die KI.** Ein Finanzmodul berechnet alle Kennzahlen Monat für Monat. Bilanz und Monatssummen werden automatisch geprüft.
 - **Die KI schreibt nur Texte, unter festen Regeln:** keine erfundenen Zahlen, keine erfundenen Studien, keine Werkzeuge, die im Land des Unternehmens nicht verfügbar sind. Jede Zahl im KI-Text, die nicht aus dem Finanzmodul stammt, wird automatisch markiert.
+- **Profi-Beispiele:** Zu jedem der 30 Textabschnitte gibt es ein ausgearbeitetes Beispiel (für eine erfundene Bäckerei), das der KI Stil und Tiefe zeigt. Übernimmt die KI daraus Namen oder Zahlen, wird das markiert.
 - **Selbstprüfung:** Nach jeder Säule bewertet die KI ihren eigenen Text (0–100) und listet Schwächen auf.
 - **Mindestgrenzen statt Durchschnitt:** Fehlt eine Pflichtgenehmigung oder wird die Liquidität negativ, lautet das Urteil „Hindernis“, egal wie gut der Rest aussieht.
 
@@ -29,7 +30,7 @@ Die Oberfläche ist auf Persisch (von rechts nach links).
 ## Stand
 
 - Prototyp, funktionsfähig.
-- Komplett getestet mit einer simulierten KI-Schnittstelle (alle fünf Säulen, Urteil, Fortschrittsplan, Speichern, Smartphone-Ansicht), dazu 23 automatische Tests. Ein Durchlauf mit dem echten Claude-API-Schlüssel steht noch aus.
+- Komplett getestet mit einer simulierten KI-Schnittstelle (alle fünf Säulen, Urteil, Fortschrittsplan, Speichern, Smartphone-Ansicht), dazu 24 automatische Tests. Ein Durchlauf mit dem echten Claude-API-Schlüssel steht noch aus.
 - **Live:** [kolbenarenji.com/5p](https://kolbenarenji.com/5p). Formular, Finanzmodul und Urteil funktionieren ohne Schlüssel. Für die KI-Texte trägt jeder Besucher seinen eigenen Claude-API-Schlüssel ein; er bleibt in seinem Browser.
 
 ## Starten
@@ -52,7 +53,7 @@ Projekte werden im Browser gespeichert. „Bericht herunterladen“ erzeugt eine
 npm test
 ```
 
-23 automatische Tests, ohne echten API-Schlüssel und ohne Kosten:
+24 automatische Tests, ohne echten API-Schlüssel und ohne Kosten:
 
 - **Finanzmodul:** Für alle zehn Vorlagen geht die Bilanz in jedem Monat auf, und die Monate ergeben die Jahressummen. Break-even, Kapazitätsgrenze, Amortisation, Liquiditätswarnung und Pflichtgenehmigungen werden mit festen Zahlen geprüft.
 - **Server:** gegen eine simulierte Claude-API. Geprüft werden normale Antworten, unlesbare Antworten, Ablehnungen, ein fehlender Schlüssel und der Schutz vor Pfad-Tricks.
