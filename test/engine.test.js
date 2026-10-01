@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL("../app.html", import.meta.url), "utf8");
 const script = html.split("<script>")[1].split("</script>")[0];
 const engineSrc = script.split("/* ================= state")[0];
 const ctx = vm.createContext({});
-vm.runInContext(engineSrc + ";globalThis.api={runEngine,engineWarnings,detScores,makeProfile,TEMPLATES,BASE,clone};", ctx);
-const { runEngine, engineWarnings, detScores, makeProfile, TEMPLATES } = ctx.api;
+vm.runInContext(engineSrc + ";globalThis.api={runEngine,engineWarnings,detScores,makeProfile,TEMPLATES,BASE,clone,COLS,EXAMPLE_BIZ};", ctx);
+const { runEngine, engineWarnings, detScores, makeProfile, TEMPLATES, COLS, EXAMPLE_BIZ } = ctx.api;
 
 test("page script parses", () => {
   assert.doesNotThrow(() => new Function(script));
@@ -69,4 +69,13 @@ test("a missing mandatory permit is a blocker", () => {
 test("public/index.html is built from the current app.html", () => {
   const built = fs.readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
   assert.ok(built.includes(html), "run: npm run build:page");
+});
+
+test("every text section has a professional example about the imaginary business only", () => {
+  for (const c of COLS) for (const s of c.sections) {
+    if (s.k === "engine") continue;
+    assert.ok(s.eg && s.eg.length > 80, `pillar ${c.id} section ${s.no} has no example`);
+  }
+  // the example business must not collide with any template name
+  for (const k of Object.keys(TEMPLATES)) assert.ok(!makeProfile(k).name.includes(EXAMPLE_BIZ));
 });
